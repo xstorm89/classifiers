@@ -24,7 +24,10 @@ public class Vector {
 		this.values = values;
 	}
 	
-	public static double euclideanNorm(Vector first, Vector second) {
+	/**
+	 * calculates the euclidean distance between two vectors
+	 */
+	public static double euclideanDistance(Vector first, Vector second) {
 		if (first.values.length != second.values.length)
 			throw new IllegalArgumentException();
 		
@@ -66,9 +69,9 @@ public class Vector {
 			throw new IllegalArgumentException();
 		
 		int nearestVectorIndex = 0;
-		double minDistance = euclideanNorm(this, points.get(0));
+		double minDistance = euclideanDistance(this, points.get(0));
 		for (int i = 1; i < points.size(); i++) {
-			double distance = euclideanNorm(this, points.get(i));
+			double distance = euclideanDistance(this, points.get(i));
 			if (distance < minDistance) {
 				nearestVectorIndex = i;
 				minDistance = distance;
@@ -82,7 +85,7 @@ public class Vector {
 		Vector first = new Vector(1, 2, 3, 4, 5);
 		Vector second = new Vector(6, 7, 8, 9, 10);
 		
-		System.out.println(Vector.euclideanNorm(first, second));
+		System.out.println(Vector.euclideanDistance(first, second));
 		System.out.println(Vector.calculateCenter(first, second));
 	}
 	

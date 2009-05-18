@@ -11,7 +11,9 @@ import java.util.Random;
 public class MembershipMatrix {
 
 	private int[][] matrix;
-	          
+	private int n;
+	private int k;
+	
 	/**
 	 * creates a MembershipMatrix and randomly initialize memberships
 	 * 
@@ -19,6 +21,9 @@ public class MembershipMatrix {
 	 * @param k number of clusters/groups
 	 */
 	public MembershipMatrix(int n, int k) {
+		this.n = n;
+		this.k = k;
+		
 		matrix = new int[n][k];
 		
 		Random random = new Random(Calendar.getInstance().getTimeInMillis());
@@ -89,7 +94,20 @@ public class MembershipMatrix {
 		return clusters;
 	}
 	
-	public int[] getPatterns(int cluster) {
+	/**
+	 * Returns the index of the cluster this pattern belongs to
+	 */
+	public  int getClusterForPattern(int patternIndex) {
+		for (int j = 0; j < k; j++) {
+			if (matrix[patternIndex][j] == 1) {
+				return j;
+			}
+		}
+		
+		throw new IllegalStateException("Pattern " + patternIndex + " doesn't belong to any cluster!");
+	}
+	
+	public int[] getPatternsForCluster(int cluster) {
 		int n = matrix.length;
 		List<Integer> patterns = new ArrayList<Integer>();
 		for (int i = 0; i < n; i++) {
@@ -111,9 +129,9 @@ public class MembershipMatrix {
 		List<Integer> clusters = mm.getClusters();
 		System.out.println("");
 		
-		int[] patterns0 = mm.getPatterns(0);
-		int[] patterns1 = mm.getPatterns(1);
-		int[] patterns2 = mm.getPatterns(2);
+		int[] patterns0 = mm.getPatternsForCluster(0);
+		int[] patterns1 = mm.getPatternsForCluster(1);
+		int[] patterns2 = mm.getPatternsForCluster(2);
 		
 		System.out.println();
 	}

@@ -15,6 +15,8 @@ public class KMeans {
 	Vector[] patterns;
 	MembershipMatrix mm;
 	
+	List<Vector> cluserCenters;
+	
 	public KMeans(int k, Vector... patterns) {
 		this.k = k;
 		this.patterns = patterns;
@@ -56,7 +58,7 @@ public class KMeans {
 		for (int i = 0; i < k; i++) {
 			newZ.add(patterns[i]);
 		}
-		
+
 		List<Vector> oldZ;
 		
 		for (int m = 0; ; m++) {
@@ -77,6 +79,7 @@ public class KMeans {
 				break;
 		}
 		
+		cluserCenters = newZ;
 		
 		return mm.getClusters();	
 	}
@@ -85,14 +88,27 @@ public class KMeans {
 	 * calculates cluster centers
 	 * @return
 	 */
-	private List<Vector> calculateZ() {
+	protected List<Vector> calculateZ() {
 		List<Vector> z = new ArrayList<Vector>();
 		for (int j = 0; j < k; j++) {
-			int[] patternIndexes = mm.getPatterns(j);
+			int[] patternIndexes = mm.getPatternsForCluster(j);
 			z.add(Vector.calculateCenter(getPatternsWithIndexes(patternIndexes)));
 		}
 		
 		return z;
+	}
+	
+	protected void updateZ(List<Vector> Z, int... changedClusters) {
+		for (int i = 0; i < changedClusters.length; i++) {
+			Z.remove(changedClusters[i]);
+			Z.add(i, calculateClusterCenter(i));
+		}
+	}
+	
+	
+	protected Vector calculateClusterCenter(int clusterIndex) {
+		int[] patternIndexes = mm.getPatternsForCluster(clusterIndex);
+		return Vector.calculateCenter(getPatternsWithIndexes(patternIndexes));
 	}
 	
 	private Vector[] getPatternsWithIndexes(int[] indexes) {
@@ -102,6 +118,31 @@ public class KMeans {
 		}
 		
 		return patterns;
+	}
+	
+	public double getMeanSquareError(List<Vector> Z) {
+		double globalError = 0;
+		List<Integer> clusters = mm.getClusters();
+		for (int i = 0; i < k; i++) {
+			double clusterError = getClusterMeanSquareError(clusters.get(i), Z);
+			globalError += clusterError;
+		}
+		
+		return globalError;
+	}
+	
+	public double getClusterMeanSquareError(int clusterIndex, List<Vector> Z) {
+		int[] clusterPatterns = mm.getPatternsForCluster(clusterIndex);
+		
+		// foreach pattern in the cluster, calculate its distance
+		// from the cluster center
+		double clusterError = 0;
+		Vector clusterCenter = Z.get(clusterIndex);
+		for (int j = 0; j < clusterPatterns.length; j++) {
+			clusterError += Vector.euclideanDistance(patterns[clusterPatterns[j]], clusterCenter);
+		}
+		
+		return clusterError;
 	}
 	
 	public String printResults() {
@@ -117,8 +158,25 @@ public class KMeans {
 	}
 	
 	public static void main(String[] args) { 
+//		Vector v1 = new Vector(0, 0);
+//		Vector v2 = new Vector(1.5, 1.5);
+//		Vector v3 = new Vector(1, 1);
+//		Vector v4 = new Vector(5, 5);
+//		Vector v5 = new Vector(5.5, 5.5);
+//		Vector v6 = new Vector(6, 6);
+//		Vector v7 = new Vector(100, 100);
+//		Vector v8 = new Vector(105, 105);
+//		Vector v9 = new Vector(102, 102);
+//		
+//		KMeans kmeans = new KMeans(3, v1, v5, v4, v7, v9, v8, v2, v3, v6);
+		
 		KMeans kmeans = new KMeans(2, 2, "C:/Gaussian.in", "\t");
 		List<Integer> clusters = kmeans.partition();
+		
+		IterativeMinimumSquareError DHF = new IterativeMinimumSquareError(2, 2, "C:/Gaussian.in", "\t");
+		List<Integer> DHFClusters = DHF.partition();
+		
 		System.out.println(kmeans.printResults());
 	}
+	
 }
