@@ -1,5 +1,7 @@
 package org.pr.clustering;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,32 @@ public class KMeans {
 		mm = new MembershipMatrix(patterns.length, k);
 	}
 	
+	public KMeans(int k, int dims, String filename, String delimiter) {
+		this.k = k;
+		
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			List<Vector> patternList = new ArrayList<Vector>();
+			for (String line = in.readLine(); line != null; line = in.readLine()) {
+				String[] strValues = line.split(delimiter);
+				double[] values = new double[dims];
+				for (int i = 0; i < dims && i < strValues.length; i++) {
+					values[i] = Double.valueOf(strValues[i]);
+				}
+				patternList.add(new Vector(values));
+			}
+			patterns = new Vector[patternList.size()];
+			for (int i = 0; i < patternList.size(); i++) {
+				patterns[i] = patternList.get(i);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		mm = new MembershipMatrix(patterns.length, k);
+	}
+	
 	/**
 	 * returns an array of integers, the ith elements represents the cluster 
 	 * index of the ith pattern
@@ -31,8 +59,6 @@ public class KMeans {
 		
 		List<Vector> oldZ;
 		
-//		List<Integer> oldClusterConfiguration = null;
-//		List<Integer> newClusterConfiguration = mm.getClusters();
 		for (int m = 0; ; m++) {
 			oldZ = newZ;
 			
@@ -78,21 +104,21 @@ public class KMeans {
 		return patterns;
 	}
 	
+	public String printResults() {
+		StringBuilder sb = new StringBuilder("");
+		sb.append("pattern \t\t cluster" + "\n");
+		
+		List<Integer> clusters = mm.getClusters();
+		for (int i = 0; i < patterns.length; i++) {
+			sb.append(patterns[i] + "\t" + (clusters.get(i) + 1) + "\n");
+		}
+		
+		return sb.toString();
+	}
+	
 	public static void main(String[] args) { 
-		Vector v1 = new Vector(0, 0);
-		Vector v4 = new Vector(5, 5);
-		Vector v8 = new Vector(105, 105);		
-		Vector v5 = new Vector(5.5, 5.5);
-		Vector v6 = new Vector(6, 6);
-		Vector v7 = new Vector(100, 100);
-		Vector v3 = new Vector(1, 1);
-		Vector v9 = new Vector(102, 102);
-		Vector v2 = new Vector(1.5, 1.5);
-		
-		KMeans kmeans = new KMeans(3, v1, v5, v4, v7, v9, v8, v2, v3, v6);
-		// Vector[] z = kmeans.calculateZ();
+		KMeans kmeans = new KMeans(2, 2, "C:/Gaussian.in", "\t");
 		List<Integer> clusters = kmeans.partition();
-		
-		System.out.println("");
+		System.out.println(kmeans.printResults());
 	}
 }
