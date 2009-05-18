@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.pr.clustering.util.DoubleUtils;
 
-public class IterativeMinimumSquareError extends KMeans {
+public abstract class IterativeMinimumSquareError extends KMeans {
 
 	public IterativeMinimumSquareError(int k, int dims, String filename, String delimiter) {
 		super(k, dims, filename, delimiter);
@@ -54,6 +54,9 @@ public class IterativeMinimumSquareError extends KMeans {
 									minCost = cost;
 									clusterToMoveTo = j;
 								}
+								if (shouldStop(m)) {
+									break;
+								}
 							}
 						}
 					}
@@ -81,6 +84,8 @@ public class IterativeMinimumSquareError extends KMeans {
 		return mm.getClusters();	
 	}
 	
+	protected abstract boolean shouldStop(int m);
+
 	public static void main(String[] args) { 
 //		Vector v1 = new Vector(0, 0);
 //		Vector v2 = new Vector(1.5, 1.5);
@@ -91,22 +96,15 @@ public class IterativeMinimumSquareError extends KMeans {
 //		Vector v7 = new Vector(100, 100);
 //		Vector v8 = new Vector(105, 105);
 //		Vector v9 = new Vector(102, 102);
-//		
-//		KMeans kmeans = new KMeans(3, v1, v5, v4, v7, v9, v8, v2, v3, v6);
 		
-//		KMeans kmeans = new KMeans(2, 2, "C:/Gaussian.in", "\t");
-//		List<Integer> clusters = kmeans.partition();
-		
-		IterativeMinimumSquareError DHF = new IterativeMinimumSquareError(2, 2, "C:/Gaussian.in", "\t");
+		IterativeMinimumSquareError DHF = new DHFirst(2, 2, "C:/Gaussian.in", "\t");
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		List<Integer> DHFClusters = DHF.partition();
 		long endTime = Calendar.getInstance().getTimeInMillis();
-		System.out.println("ExecutionTime = " + (endTime - startTime) / 1000 + " sec");
-		 
-//		System.out.println("KMeans-----------------");
-//		System.out.println(kmeans.printResults());
 		System.out.println("DHF--------------------");
 		System.out.println(DHF.printResults());
+		System.out.println("--------------------");
+		System.out.println("ExecutionTime = " + (endTime - startTime) / 1000 + " sec");
 	}
 	
 }
