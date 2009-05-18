@@ -157,26 +157,4 @@ public class KMeans {
 		return sb.toString();
 	}
 	
-	public static void main(String[] args) { 
-//		Vector v1 = new Vector(0, 0);
-//		Vector v2 = new Vector(1.5, 1.5);
-//		Vector v3 = new Vector(1, 1);
-//		Vector v4 = new Vector(5, 5);
-//		Vector v5 = new Vector(5.5, 5.5);
-//		Vector v6 = new Vector(6, 6);
-//		Vector v7 = new Vector(100, 100);
-//		Vector v8 = new Vector(105, 105);
-//		Vector v9 = new Vector(102, 102);
-//		
-//		KMeans kmeans = new KMeans(3, v1, v5, v4, v7, v9, v8, v2, v3, v6);
-		
-		KMeans kmeans = new KMeans(2, 2, "C:/Gaussian.in", "\t");
-		List<Integer> clusters = kmeans.partition();
-		
-		IterativeMinimumSquareError DHF = new IterativeMinimumSquareError(2, 2, "C:/Gaussian.in", "\t");
-		List<Integer> DHFClusters = DHF.partition();
-		
-		System.out.println(kmeans.printResults());
-	}
-	
 }
