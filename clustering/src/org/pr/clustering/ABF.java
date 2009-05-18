@@ -1,5 +1,10 @@
 package org.pr.clustering;
 
+/**
+ * Best on odd & First on even
+ * 
+ * @author Ahmad
+ */
 public class ABF extends IterativeMinimumSquareError {
 
 	public ABF(int k, int dims, String filename, String delimiter) {
@@ -9,8 +14,8 @@ public class ABF extends IterativeMinimumSquareError {
 	@Override
 	protected boolean shouldStop(int m) {
 		if (m % 2 == 1) // odd
-			return true;
-		return false;
+			return false;
+		return true;
 	}
 
 }

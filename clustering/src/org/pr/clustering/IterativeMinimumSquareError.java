@@ -84,6 +84,10 @@ public abstract class IterativeMinimumSquareError extends KMeans {
 		return mm.getClusters();	
 	}
 	
+	/**
+	 * Returns true when the implementing class wants to execute the core DHF, 
+	 * and false if the implementing class wants to execute the core DHF.
+	 */
 	protected abstract boolean shouldStop(int m);
 
 	public static void main(String[] args) { 
