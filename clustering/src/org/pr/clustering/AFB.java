@@ -7,8 +7,8 @@ package org.pr.clustering;
  */
 public class AFB extends IterativeMinimumSquareError {
 
-	public AFB(int k, int dims, String filename, String delimiter) {
-		super(k, dims, filename, delimiter);
+	public AFB(int k, Vector[] patterns) {
+		super(k, patterns, ClusteringAlgorithm.AFB);
 	}
 
 	@Override

@@ -1,52 +1,20 @@
 package org.pr.clustering;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Ahmad
  *
  */
-public class KMeans {
+public class KMeans extends AbstractClusteringAlgorithm {
 
-	int k;
-	Vector[] patterns;
-	MembershipMatrix mm;
-	
-	List<Vector> cluserCenters;
-	
 	public KMeans(int k, Vector... patterns) {
-		this.k = k;
-		this.patterns = patterns;
-		mm = new MembershipMatrix(patterns.length, k);
-	}
-	
-	public KMeans(int k, int dims, String filename, String delimiter) {
-		this.k = k;
-		
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(filename));
-			List<Vector> patternList = new ArrayList<Vector>();
-			for (String line = in.readLine(); line != null; line = in.readLine()) {
-				String[] strValues = line.split(delimiter);
-				double[] values = new double[dims];
-				for (int i = 0; i < dims && i < strValues.length; i++) {
-					values[i] = Double.valueOf(strValues[i]);
-				}
-				patternList.add(new Vector(values));
-			}
-			patterns = new Vector[patternList.size()];
-			for (int i = 0; i < patternList.size(); i++) {
-				patterns[i] = patternList.get(i);
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		mm = new MembershipMatrix(patterns.length, k);
+		super(k, patterns, ClusteringAlgorithm.KMeans);
 	}
 	
 	/**
@@ -54,9 +22,18 @@ public class KMeans {
 	 * index of the ith pattern
 	 */
 	public List<Integer> partition() {
+		// we need to randomize this step
 		List<Vector> newZ = new ArrayList<Vector>();
+		Random rand = new Random(Calendar.getInstance().getTimeInMillis());
+		List<Integer> usedPatterns = new ArrayList<Integer>();
 		for (int i = 0; i < k; i++) {
-			newZ.add(patterns[i]);
+			Integer pattern;
+			do {
+				pattern = rand.nextInt(patterns.length); 
+			} while (usedPatterns.contains(pattern));
+			
+			usedPatterns.add(pattern);
+			newZ.add(patterns[pattern]);
 		}
 
 		List<Vector> oldZ;
@@ -82,79 +59,6 @@ public class KMeans {
 		cluserCenters = newZ;
 		
 		return mm.getClusters();	
-	}
-	
-	/**
-	 * calculates cluster centers
-	 * @return
-	 */
-	protected List<Vector> calculateZ() {
-		List<Vector> z = new ArrayList<Vector>();
-		for (int j = 0; j < k; j++) {
-			int[] patternIndexes = mm.getPatternsForCluster(j);
-			z.add(Vector.calculateCenter(getPatternsWithIndexes(patternIndexes)));
-		}
-		
-		return z;
-	}
-	
-	protected void updateZ(List<Vector> Z, int... changedClusters) {
-		for (int i = 0; i < changedClusters.length; i++) {
-			Z.remove(changedClusters[i]);
-			Z.add(i, calculateClusterCenter(i));
-		}
-	}
-	
-	
-	protected Vector calculateClusterCenter(int clusterIndex) {
-		int[] patternIndexes = mm.getPatternsForCluster(clusterIndex);
-		return Vector.calculateCenter(getPatternsWithIndexes(patternIndexes));
-	}
-	
-	private Vector[] getPatternsWithIndexes(int[] indexes) {
-		Vector[] patterns = new Vector[indexes.length];
-		for (int i = 0; i < patterns.length; i++) {
-			patterns[i] = this.patterns[indexes[i]];
-		}
-		
-		return patterns;
-	}
-	
-	public double getMeanSquareError(List<Vector> Z) {
-		double globalError = 0;
-		List<Integer> clusters = mm.getClusters();
-		for (int i = 0; i < k; i++) {
-			double clusterError = getClusterMeanSquareError(clusters.get(i), Z);
-			globalError += clusterError;
-		}
-		
-		return globalError;
-	}
-	
-	public double getClusterMeanSquareError(int clusterIndex, List<Vector> Z) {
-		int[] clusterPatterns = mm.getPatternsForCluster(clusterIndex);
-		
-		// foreach pattern in the cluster, calculate its distance
-		// from the cluster center
-		double clusterError = 0;
-		Vector clusterCenter = Z.get(clusterIndex);
-		for (int j = 0; j < clusterPatterns.length; j++) {
-			clusterError += Vector.euclideanDistance(patterns[clusterPatterns[j]], clusterCenter);
-		}
-		
-		return clusterError;
-	}
-	
-	public String printResults() {
-		StringBuilder sb = new StringBuilder("");
-		sb.append("pattern \t\t cluster" + "\n");
-		
-		List<Integer> clusters = mm.getClusters();
-		for (int i = 0; i < patterns.length; i++) {
-			sb.append(patterns[i] + "\t" + (clusters.get(i) + 1) + "\n");
-		}
-		
-		return sb.toString();
 	}
 	
 }

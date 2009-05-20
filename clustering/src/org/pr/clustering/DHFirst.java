@@ -2,8 +2,8 @@ package org.pr.clustering;
 
 public class DHFirst extends IterativeMinimumSquareError {
 
-	public DHFirst(int k, int dims, String filename, String delimiter) {
-		super(k, dims, filename, delimiter);
+	public DHFirst(int k, Vector[] patterns) {
+		super(k, patterns, ClusteringAlgorithm.DHF);
 	}
 
 	@Override

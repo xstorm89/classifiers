@@ -10,9 +10,9 @@ import java.util.Random;
  */
 public class MembershipMatrix {
 
-	private int[][] matrix;
-	private int n;
-	private int k;
+	int[][] matrix;
+	int n;
+	int k;
 	
 	/**
 	 * creates a MembershipMatrix and randomly initialize memberships
@@ -30,6 +30,7 @@ public class MembershipMatrix {
 		
 		// for the first k patterns, assign them to k cluster
 		// this way, we guarantee that every cluster has at least one pattern
+		
 		for (int i = 0; i < k; i++) {
 			matrix[i][i] = 1;
 		}
