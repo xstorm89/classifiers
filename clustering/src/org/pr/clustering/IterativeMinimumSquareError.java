@@ -3,26 +3,32 @@ package org.pr.clustering;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import org.pr.clustering.util.DoubleUtils;
 
-public abstract class IterativeMinimumSquareError extends KMeans {
-
-	public IterativeMinimumSquareError(int k, int dims, String filename, String delimiter) {
-		super(k, dims, filename, delimiter);
-	}
+public abstract class IterativeMinimumSquareError extends AbstractClusteringAlgorithm {
 	
-	public IterativeMinimumSquareError(int k, Vector[] patterns) {
-		super(k, patterns);
+	public IterativeMinimumSquareError(int k, Vector[] patterns, ClusteringAlgorithm type) {
+		super(k, patterns, type);
 	}
 	
 	@Override
 	public List<Integer> partition() {
+		// we need to randomize this step
 		List<Vector> Z = new ArrayList<Vector>();
+		Random rand = new Random(Calendar.getInstance().getTimeInMillis());
+		List<Integer> usedPatterns = new ArrayList<Integer>();
 		for (int i = 0; i < k; i++) {
-			int index = ( patterns.length * (i) ) / k;
-			Z.add(patterns[index]);
+			Integer pattern;
+			do {
+				pattern = rand.nextInt(patterns.length); 
+			} while (usedPatterns.contains(pattern));
+			
+			usedPatterns.add(pattern);
+			Z.add(patterns[pattern]);
 		}
+		
 		
 		double newGlobalObjFun = getMeanSquareError(Z);
 		double oldGlobalObjFun;
@@ -101,7 +107,10 @@ public abstract class IterativeMinimumSquareError extends KMeans {
 //		Vector v8 = new Vector(105, 105);
 //		Vector v9 = new Vector(102, 102);
 		
-		IterativeMinimumSquareError DHF = new DHFirst(2, 2, "C:/Gaussian.in", "\t");
+		AbstractClusteringAlgorithm DHF 
+			= AbstractClusteringAlgorithm.Factory.create
+				(ClusteringAlgorithm.DHF, 2, 2, "C:/Gaussian.in", "\t");
+		
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		List<Integer> DHFClusters = DHF.partition();
 		long endTime = Calendar.getInstance().getTimeInMillis();
