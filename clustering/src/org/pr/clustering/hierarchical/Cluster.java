@@ -15,6 +15,7 @@ public class Cluster {
 	String name;
 	
 	public Cluster(String name, int patternIndex) {
+		this.name = name;
 		patternIndexes = new ArrayList<Integer>();
 		patternIndexes.add(patternIndex);
 	}
@@ -22,7 +23,7 @@ public class Cluster {
 	public Cluster(Cluster left, Cluster right) {
 		this.left = left;
 		this.right = right;
-		this.name = left.name + "," + right.name;
+		this.name = "[" + left.name + "," + right.name + "]";
 		
 		patternIndexes = new ArrayList<Integer>();
 		for (Integer index : left.getPatternIndexes()) {
@@ -35,5 +36,10 @@ public class Cluster {
 	
 	List<Integer> getPatternIndexes() {
 		return patternIndexes;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }
