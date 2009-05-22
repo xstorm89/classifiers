@@ -7,16 +7,19 @@ import org.pr.clustering.Vector;
 import org.pr.clustering.hierarchical.SparseMatrix.DistanceInfo;
 
 /**
+ * Agglomerative hierarchical clustering algorithm. The linkage criteria
+ * is set in the constructor of the algorithm.
+ *   
  * @author Ahmad Faheem & Amr Ghoneim 
  */
-public class AbstractHierarchical {
+public class Hierarchical {
 
 	Vector[] patterns;
 	LinkageCriterion linkageCriterion;
 	
 	List<Cluster> clusters;
 	
-	AbstractHierarchical(Vector[] patterns, LinkageCriterion linkageCriterion) {
+	Hierarchical(Vector[] patterns, LinkageCriterion linkageCriterion) {
 		this.patterns = patterns;
 		this.linkageCriterion = linkageCriterion;
 	}
@@ -71,7 +74,7 @@ public class AbstractHierarchical {
 		patternList.add(v4);
 		patternList.add(v5);
 		
-		AbstractHierarchical hierarchical = new AbstractHierarchical(patternList.toArray(new Vector[patternList.size()]), LinkageCriterion.WPGMC);
+		Hierarchical hierarchical = new Hierarchical(patternList.toArray(new Vector[patternList.size()]), LinkageCriterion.WPGMC);
 		hierarchical.partition();
 		
 	}
