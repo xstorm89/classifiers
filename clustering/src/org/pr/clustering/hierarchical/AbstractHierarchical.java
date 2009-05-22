@@ -49,6 +49,9 @@ public class AbstractHierarchical {
 			
 			iterationCount++;
 		}
+		
+		System.out.println(clusters.get(0));
+		
 		return null;
 	}
 	
