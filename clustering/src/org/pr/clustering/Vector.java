@@ -111,4 +111,11 @@ public class Vector {
 		
 	}
 	
+	public int getDimensionCount() {
+		return values.length;
+	}
+	
+	public double getDimension(int dimIndex) {
+		return values[dimIndex];
+	}
 }
