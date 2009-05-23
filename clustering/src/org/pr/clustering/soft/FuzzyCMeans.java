@@ -1,8 +1,10 @@
 package org.pr.clustering.soft;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pr.clustering.AbstractClusteringAlgorithm;
 import org.pr.clustering.Vector;
 
 /**
@@ -20,18 +22,47 @@ public class FuzzyCMeans {
 		this.patterns = patterns;
 		this.c = c;
 		this.m = m;
-		mm = new MembershipMatrix(patterns.length, c);
 	}
 
 	public void partition() {
+		// 1. choose an arbitrary membership matrix
+		mm = new MembershipMatrix(patterns.length, c);
+		
+		// 2. calculate cluster centers
 		List<Vector> newC = calculateC();
+		
+		List<Vector> oldC;
+		
+		double exponent = 2.0 / (m - 1); 
+		for (int m = 0; ; m++) {
+			oldC = newC;
+			
+			// 3. update membership matrix
+			for (int i = 0; i < patterns.length; i++) { // loop over patterns
+				for (int j = 0; j < c; j++) { // loop over clusters
+					double denominator = 0;
+					double xi_cj_distance = Vector.euclideanDistance(patterns[i], newC.get(j));
+					for (int r = 0; r < c; r++) {
+						double xi_cr_distance = Vector.euclideanDistance(patterns[i], newC.get(r));
+						double ratio = Math.pow(xi_cj_distance / xi_cr_distance, exponent);
+						denominator += ratio;
+					}
+					
+					mm.matrix[i][j] = 1.0 / denominator; 
+				}
+			}
+			
+			newC = calculateC();
+			
+			if (newC.equals(oldC))
+				break;
+		}
 		
 		System.out.println(newC);
 	}
 	
 	/**
-	 * calculates cluster centers
-	 * @return
+	 * calculates cluster centers with current clustering configurations.
 	 */
 	protected List<Vector> calculateC() {
 		List<Vector> C = new ArrayList<Vector>();
@@ -57,24 +88,26 @@ public class FuzzyCMeans {
 		return C;
 	}
 	
-	public static void main(String[] args) {
-		Vector v0 = new Vector(0, 0);
-		Vector v1 = new Vector(1, 1);
-		Vector v2 = new Vector(3, 3);
-		Vector v3 = new Vector(5, 5);
-		Vector v4 = new Vector(7, 7);
-		Vector v5 = new Vector(10, 10);
-
-		List<Vector> patternList = new ArrayList<Vector>();
-		patternList.add(v0);
-		patternList.add(v1);
-		patternList.add(v2);
-		patternList.add(v3);
-		patternList.add(v4);
-		patternList.add(v5);
+	public String printResults() {
+		StringBuilder sb = new StringBuilder("");
+		sb.append("pattern \t\t cluster memberships" + "\n");
 		
-		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans(patternList.toArray(new Vector[patternList.size()]), 3, 2);
+		DecimalFormat format = new DecimalFormat("#.###");
+		
+		for (int i = 0; i < patterns.length; i++) { // loop over patterns
+			sb.append("\n"); // + patterns[i] + ": ");
+			for (int j = 0; j < c; j++) { // loop over clusters
+				sb.append(format.format(mm.matrix[i][j]) + "\t");
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans(AbstractClusteringAlgorithm.loadPatterns(2, "C:/Gaussian.in", "\t"), 2, 2);
 		fuzzyCMeans.partition();
+		System.out.println(fuzzyCMeans.printResults());
 	}
 	
 }

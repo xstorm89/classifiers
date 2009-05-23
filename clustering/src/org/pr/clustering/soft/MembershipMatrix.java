@@ -1,5 +1,8 @@
 package org.pr.clustering.soft;
 
+import java.util.Calendar;
+import java.util.Random;
+
 
 /**
  * @author Ahmad
@@ -23,10 +26,24 @@ public class MembershipMatrix {
 		matrix = new double[n][c];
 		
 		// we can make the random value to be 1 / k, 
-		// giving equal memberships for all clusters
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < c; j++)
-				matrix[i][j] = 1.0 / (double) c;
+		// giving equal memberships for all clusters << BAD IDEA, 
+		// THIS WAY WE WILL GET OVERLAPPING CLUSTER CENTERS AT THE FIRST STEP
+		
+		// we need to really randomize this
+		Random rand = new Random(Calendar.getInstance().getTimeInMillis());
+		for (int i = 0; i < n; i++) {
+			double rowSum = 0;
+			for (int j = 0; j < c; j++) {
+				double randomMembership = rand.nextDouble();
+				if (randomMembership + rowSum >= 1) {
+					matrix[i][j] = 1- rowSum;
+					break;
+				} else {
+					matrix[i][j] = randomMembership;
+					rowSum += randomMembership;
+				}
+			}
+		}
 	}
 	
 	/**
