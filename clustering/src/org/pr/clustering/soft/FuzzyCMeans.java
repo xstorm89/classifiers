@@ -13,38 +13,38 @@ import org.pr.clustering.Vector;
 public class FuzzyCMeans {
 
 	Vector[] patterns;
-	int c;
+	int k;
 	double m;
 	
 	MembershipMatrix mm;
 	
-	public FuzzyCMeans(Vector[] patterns, int c, double m) {
+	public FuzzyCMeans(Vector[] patterns, int k, double m) {
 		this.patterns = patterns;
-		this.c = c;
+		this.k = k;
 		this.m = m;
 	}
 
 	public void partition() {
 		// 1. choose an arbitrary membership matrix
-		mm = new MembershipMatrix(patterns.length, c);
+		mm = new MembershipMatrix(patterns.length, k);
 		
 		// 2. calculate cluster centers
-		List<Vector> newC = calculateC();
+		List<Vector> newZ = calculateZ();
 		
-		List<Vector> oldC;
+		List<Vector> oldZ;
 		
 		double exponent = 2.0 / (m - 1); 
 		for (int m = 0; ; m++) {
-			oldC = newC;
+			oldZ = newZ;
 			
 			// 3. update membership matrix
 			for (int i = 0; i < patterns.length; i++) { // loop over patterns
-				for (int j = 0; j < c; j++) { // loop over clusters
+				for (int j = 0; j < k; j++) { // loop over clusters
 					double denominator = 0;
-					double xi_cj_distance = Vector.euclideanDistance(patterns[i], newC.get(j));
-					for (int r = 0; r < c; r++) {
-						double xi_cr_distance = Vector.euclideanDistance(patterns[i], newC.get(r));
-						double ratio = Math.pow(xi_cj_distance / xi_cr_distance, exponent);
+					double xi_zj_distance = Vector.euclideanDistance(patterns[i], newZ.get(j));
+					for (int r = 0; r < k; r++) {
+						double xi_zr_distance = Vector.euclideanDistance(patterns[i], newZ.get(r));
+						double ratio = Math.pow(xi_zj_distance / xi_zr_distance, exponent);
 						denominator += ratio;
 					}
 					
@@ -52,21 +52,21 @@ public class FuzzyCMeans {
 				}
 			}
 			
-			newC = calculateC();
+			newZ = calculateZ();
 			
-			if (newC.equals(oldC))
+			if (newZ.equals(oldZ))
 				break;
 		}
 		
-		System.out.println(newC);
+		System.out.println(newZ);
 	}
 	
 	/**
 	 * calculates cluster centers with current clustering configurations.
 	 */
-	protected List<Vector> calculateC() {
+	protected List<Vector> calculateZ() {
 		List<Vector> C = new ArrayList<Vector>();
-		for (int j = 0; j < c; j++) {
+		for (int j = 0; j < k; j++) {
 			double[] values = new double[this.patterns[0].getDimensionCount()];
 			// we need to iteration to get each dimension
 			for (int dimIndex = 0; dimIndex < values.length; dimIndex++) {
@@ -96,7 +96,7 @@ public class FuzzyCMeans {
 		
 		for (int i = 0; i < patterns.length; i++) { // loop over patterns
 			sb.append("\n"); // + patterns[i] + ": ");
-			for (int j = 0; j < c; j++) { // loop over clusters
+			for (int j = 0; j < k; j++) { // loop over clusters
 				sb.append(format.format(mm.matrix[i][j]) + "\t");
 			}
 		}
