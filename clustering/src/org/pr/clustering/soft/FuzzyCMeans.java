@@ -37,13 +37,21 @@ public class FuzzyCMeans {
 		for (int m = 0; ; m++) {
 			oldZ = newZ;
 			
+			// i need to calculate distance matrix
+			// to be used in the following nested loops to get 
+			// xi_zj_distance and xi_zr_distance
+			// instead of caculating the same value everytime
+			// we need it
+			
+			double[][] distanceMatrix = calculateDistanceMatrix(newZ); 
+			
 			// 3. update membership matrix
 			for (int i = 0; i < patterns.length; i++) { // loop over patterns
 				for (int j = 0; j < k; j++) { // loop over clusters
 					double denominator = 0;
-					double xi_zj_distance = Vector.euclideanDistance(patterns[i], newZ.get(j));
+					double xi_zj_distance = distanceMatrix[i][j];
 					for (int r = 0; r < k; r++) {
-						double xi_zr_distance = Vector.euclideanDistance(patterns[i], newZ.get(r));
+						double xi_zr_distance = distanceMatrix[i][r];
 						double ratio = Math.pow(xi_zj_distance / xi_zr_distance, exponent);
 						denominator += ratio;
 					}
@@ -102,6 +110,18 @@ public class FuzzyCMeans {
 		}
 		
 		return sb.toString();
+	}
+
+	private double[][] calculateDistanceMatrix(List<Vector> clusterCenters) {
+		double[][] distanceMatrix = new double[patterns.length][];
+		for (int i = 0; i < distanceMatrix.length; i++) {
+			distanceMatrix[i] = new double[k];
+			for (int j = 0; j < k; j++) {
+				distanceMatrix[i][j] = Vector.euclideanDistance(patterns[i], clusterCenters.get(j));
+			}
+		}	
+		
+		return distanceMatrix;
 	}
 	
 	public static void main(String[] args) {
