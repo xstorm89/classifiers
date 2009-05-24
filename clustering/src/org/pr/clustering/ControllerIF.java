@@ -6,9 +6,9 @@ public interface ControllerIF {
 
 	public List<ClusterRunResult> doKMeansBenchmark
 		(int k,  
-		int dims,
 		String dataFilename,
 		String delimeter,
+		boolean lastColumnIsLable,
 		int numRuns,
 		ClusteringAlgorithm... algorithms);
 	

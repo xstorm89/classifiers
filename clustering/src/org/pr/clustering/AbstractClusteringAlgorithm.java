@@ -5,129 +5,18 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pr.clustering.hierarchical.Hierarchical;
+import org.pr.clustering.hierarchical.LinkageCriterion;
+import org.pr.clustering.soft.FuzzyCMeans;
+import org.pr.clustering.soft.SoftKMeans;
+
 public abstract class AbstractClusteringAlgorithm {
-
-	int k;
-	Vector[] patterns;
-	MembershipMatrix mm;
-	
-	List<Vector> cluserCenters;
-
-	private ClusteringAlgorithm type;
-	
-	public AbstractClusteringAlgorithm(int k, Vector[] patterns, ClusteringAlgorithm type) {
-		this.k = k;
-		this.patterns = patterns;
-		mm = new MembershipMatrix(patterns.length, k);
-		
-		this.type = type;
-	}
 	
 	public abstract List<Integer> partition();
 	
-	public PatternMembership[] getClusteringResult() {
-		PatternMembership[] patternMemberships = new PatternMembership[patterns.length];
-		
-		for (int i = 0; i < patterns.length; i++) {
-			patternMemberships[i] = 
-				new PatternMembership(patterns[i], mm.getClusterForPattern(i));
-		}
-		
-		return patternMemberships;
-	}
+	public abstract String printResults();
 	
-	public double getMeanSquareError() {
-		double globalError = 0;
-		List<Integer> clusters = mm.getClusters();
-		for (int i = 0; i < k; i++) {
-			double clusterError = getClusterMeanSquareError(clusters.get(i), cluserCenters);
-			globalError += clusterError;
-		}
-		
-		return globalError;
-	}
-	
-	public ClusteringAlgorithm getType() {
-		return type;
-	}
-	
-	//
-	// Utility Methods
-	//
-
-	/**
-	 * calculates cluster centers
-	 * @return
-	 */
-	protected List<Vector> calculateZ() {
-		List<Vector> z = new ArrayList<Vector>();
-		for (int j = 0; j < k; j++) {
-			int[] patternIndexes = mm.getPatternsForCluster(j);
-			z.add(Vector.calculateCenter(getPatternsWithIndexes(patternIndexes)));
-		}
-		
-		return z;
-	}
-	
-	protected void updateZ(List<Vector> Z, int... changedClusters) {
-		for (int i = 0; i < changedClusters.length; i++) {
-			Z.remove(changedClusters[i]);
-			Z.add(i, calculateClusterCenter(i));
-		}
-	}
-	
-	protected Vector calculateClusterCenter(int clusterIndex) {
-		int[] patternIndexes = mm.getPatternsForCluster(clusterIndex);
-		return Vector.calculateCenter(getPatternsWithIndexes(patternIndexes));
-	}
-	
-	protected Vector[] getPatternsWithIndexes(int[] indexes) {
-		Vector[] patterns = new Vector[indexes.length];
-		for (int i = 0; i < patterns.length; i++) {
-			patterns[i] = this.patterns[indexes[i]];
-		}
-		
-		return patterns;
-	}
-	
-	protected double getMeanSquareError(List<Vector> Z) {
-		double globalError = 0;
-		List<Integer> clusters = mm.getClusters();
-		for (int i = 0; i < k; i++) {
-			double clusterError = getClusterMeanSquareError(clusters.get(i), Z);
-			globalError += clusterError;
-		}
-		
-		return globalError;
-	}
-	
-	protected double getClusterMeanSquareError(int clusterIndex, List<Vector> Z) {
-		int[] clusterPatterns = mm.getPatternsForCluster(clusterIndex);
-		
-		// foreach pattern in the cluster, calculate its distance
-		// from the cluster center
-		double clusterError = 0;
-		Vector clusterCenter = Z.get(clusterIndex);
-		for (int j = 0; j < clusterPatterns.length; j++) {
-			clusterError += Vector.euclideanDistance(patterns[clusterPatterns[j]], clusterCenter);
-		}
-		
-		return clusterError;
-	}
-	
-	public String printResults() {
-		StringBuilder sb = new StringBuilder("");
-		sb.append("pattern \t\t cluster" + "\n");
-		
-		List<Integer> clusters = mm.getClusters();
-		for (int i = 0; i < patterns.length; i++) {
-			sb.append(patterns[i] + "\t" + (clusters.get(i) + 1) + "\n");
-		}
-		
-		return sb.toString();
-	}
-	
-	public static Vector[] loadPatterns(int dims, String filename, String delimiter) {
+	public static Vector[] loadPatterns(String filename, String delimiter, boolean lastColumnIsLable) {
 		Vector[] patterns = null;
 		
 		try {
@@ -135,8 +24,11 @@ public abstract class AbstractClusteringAlgorithm {
 			List<Vector> patternList = new ArrayList<Vector>();
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				String[] strValues = line.split(delimiter);
-				double[] values = new double[dims];
-				for (int i = 0; i < dims && i < strValues.length; i++) {
+				int dimCount = lastColumnIsLable
+					? strValues.length - 1
+					: strValues.length;
+				double[] values = new double[dimCount];
+				for (int i = 0; i < dimCount; i++) {
 					values[i] = Double.valueOf(strValues[i]);
 				}
 				patternList.add(new Vector(values));
@@ -159,7 +51,11 @@ public abstract class AbstractClusteringAlgorithm {
 	
 	public static class Factory {
 		public static AbstractClusteringAlgorithm create
-			(ClusteringAlgorithm clusteringAlgorithm, int k, Vector... patterns) {
+			(ClusteringAlgorithm clusteringAlgorithm, 
+			int k,
+			double m,
+			double alpha,
+			Vector... patterns) {
 			
 			if (clusteringAlgorithm.equals(ClusteringAlgorithm.KMeans))
 				return new KMeans(k, patterns);
@@ -171,6 +67,24 @@ public abstract class AbstractClusteringAlgorithm {
 				return new ABF(k, patterns);
 			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.AFB))
 				return new AFB(k, patterns);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.SINGLE))
+				return new Hierarchical(patterns, LinkageCriterion.SINGLE);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.COMPLETE))
+				return new Hierarchical(patterns, LinkageCriterion.COMPLETE);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.UPGMA))
+				return new Hierarchical(patterns, LinkageCriterion.UPGMA);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.WPGMA))
+				return new Hierarchical(patterns, LinkageCriterion.WPGMA);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.UPGMC))
+				return new Hierarchical(patterns, LinkageCriterion.UPGMC);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.WPGMC))
+				return new Hierarchical(patterns, LinkageCriterion.WPGMC);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.Ward))
+				return new Hierarchical(patterns, LinkageCriterion.Ward);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.FuzzyKMeans))
+				return new FuzzyCMeans(patterns, k, m);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.Ward))
+				return new SoftKMeans(patterns, k, m, alpha);
 			else
 				throw new IllegalArgumentException
 					("Algorithm " + clusteringAlgorithm.getName() + " is not supported (yet)");
@@ -178,11 +92,15 @@ public abstract class AbstractClusteringAlgorithm {
 		}
 		
 		public static AbstractClusteringAlgorithm create
-			(ClusteringAlgorithm clusteringAlgorithm, int k, int dims, String filename, String delimiter) 
+			(ClusteringAlgorithm clusteringAlgorithm, 
+			int k,
+			double m,
+			double alpha,
+			String filename, String delimiter, boolean lastColumnIsLable) 
 			throws IllegalArgumentException {
 			
-			Vector[] patterns = loadPatterns(dims, filename, delimiter);
-			return create(clusteringAlgorithm, k, patterns);
+			Vector[] patterns = loadPatterns(filename, delimiter, lastColumnIsLable);
+			return create(clusteringAlgorithm, k, m, alpha, patterns);
 		}
 		
 	}
