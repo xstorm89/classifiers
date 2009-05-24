@@ -7,7 +7,7 @@ import java.util.Random;
 
 import org.pr.clustering.util.DoubleUtils;
 
-public abstract class IterativeMinimumSquareError extends AbstractClusteringAlgorithm {
+public abstract class IterativeMinimumSquareError extends AbstractPartitioningAlgorithm {
 	
 	public IterativeMinimumSquareError(int k, Vector[] patterns, ClusteringAlgorithm type) {
 		super(k, patterns, type);
@@ -109,7 +109,7 @@ public abstract class IterativeMinimumSquareError extends AbstractClusteringAlgo
 		
 		AbstractClusteringAlgorithm DHF 
 			= AbstractClusteringAlgorithm.Factory.create
-				(ClusteringAlgorithm.DHF, 2, 2, "C:/Gaussian.in", "\t");
+				(ClusteringAlgorithm.DHF, 2, 2, -1, "C:/Gaussian.in", "\t", true);
 		
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		List<Integer> DHFClusters = DHF.partition();

@@ -10,7 +10,7 @@ import org.pr.clustering.Vector;
 /**
  * @author Ahmad
  */
-public class FuzzyCMeans {
+public class FuzzyCMeans extends AbstractClusteringAlgorithm {
 
 	Vector[] patterns;
 	int k;
@@ -24,7 +24,7 @@ public class FuzzyCMeans {
 		this.m = m;
 	}
 
-	public void partition() {
+	public List<Integer> partition() {
 		// 1. choose an arbitrary membership matrix
 		mm = new MembershipMatrix(patterns.length, k);
 		
@@ -67,6 +67,9 @@ public class FuzzyCMeans {
 		}
 		
 		System.out.println(newZ);
+		
+		// TODO not implmented
+		return null;
 	}
 	
 	/**
@@ -125,7 +128,7 @@ public class FuzzyCMeans {
 	}
 	
 	public static void main(String[] args) {
-		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans(AbstractClusteringAlgorithm.loadPatterns(2, "C:/Gaussian.in", "\t"), 2, 2);
+		FuzzyCMeans fuzzyCMeans = new FuzzyCMeans(AbstractClusteringAlgorithm.loadPatterns("C:/Gaussian.in", "\t", true), 2, 2);
 		fuzzyCMeans.partition();
 		System.out.println(fuzzyCMeans.printResults());
 	}

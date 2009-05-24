@@ -2,8 +2,6 @@ package org.pr.clustering;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
@@ -11,7 +9,7 @@ import java.util.Random;
  * @author Ahmad
  *
  */
-public class KMeans extends AbstractClusteringAlgorithm {
+public class KMeans extends AbstractPartitioningAlgorithm {
 
 	public KMeans(int k, Vector... patterns) {
 		super(k, patterns, ClusteringAlgorithm.KMeans);

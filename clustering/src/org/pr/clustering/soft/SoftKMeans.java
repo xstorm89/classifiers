@@ -11,7 +11,7 @@ import org.pr.clustering.util.DoubleUtils;
 /**
  * @author Ahmad
  */
-public class SoftKMeans {
+public class SoftKMeans extends AbstractClusteringAlgorithm {
 
 	Vector[] patterns;
 	int k;
@@ -27,7 +27,7 @@ public class SoftKMeans {
 		this.alpha = alpha;
 	}
 
-	public void partition() {
+	public List<Integer> partition() {
 		double Tw = alpha / (double) k;
 		
 		// [SKM.1] select initial cluster center arbitrary
@@ -105,6 +105,9 @@ public class SoftKMeans {
 		}
 		
 		System.out.println(newZ);
+		
+		// TODO not implemented
+		return null;
 	}
 	
 	/**
@@ -163,7 +166,7 @@ public class SoftKMeans {
 	}
 	
 	public static void main(String[] args) {
-		SoftKMeans fuzzyCMeans = new SoftKMeans(AbstractClusteringAlgorithm.loadPatterns(2, "C:/Gaussian.in", "\t"), 2, 2, 0.5);
+		SoftKMeans fuzzyCMeans = new SoftKMeans(AbstractClusteringAlgorithm.loadPatterns("C:/Gaussian.in", "\t", true), 2, 2, 0.5);
 		fuzzyCMeans.partition();
 		System.out.println(fuzzyCMeans.printResults());
 	}

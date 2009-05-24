@@ -3,6 +3,7 @@ package org.pr.clustering.hierarchical;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pr.clustering.AbstractClusteringAlgorithm;
 import org.pr.clustering.Vector;
 import org.pr.clustering.hierarchical.SparseMatrix.DistanceInfo;
 
@@ -12,14 +13,14 @@ import org.pr.clustering.hierarchical.SparseMatrix.DistanceInfo;
  *   
  * @author Ahmad Faheem & Amr Ghoneim 
  */
-public class Hierarchical {
+public class Hierarchical extends AbstractClusteringAlgorithm {
 
 	Vector[] patterns;
 	LinkageCriterion linkageCriterion;
 	
 	List<Cluster> clusters;
 	
-	Hierarchical(Vector[] patterns, LinkageCriterion linkageCriterion) {
+	public Hierarchical(Vector[] patterns, LinkageCriterion linkageCriterion) {
 		this.patterns = patterns;
 		this.linkageCriterion = linkageCriterion;
 	}
@@ -77,6 +78,12 @@ public class Hierarchical {
 		Hierarchical hierarchical = new Hierarchical(patternList.toArray(new Vector[patternList.size()]), LinkageCriterion.WPGMC);
 		hierarchical.partition();
 		
+	}
+
+	@Override
+	public String printResults() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	
