@@ -2,16 +2,16 @@ package org.pr.clustering;
 
 import java.util.List;
 
-public class ClusterRunResult {
+public class ClusteringAlgorithmMultiRunningResult {
 
 	private ClusteringAlgorithm algorithm;  
-	private List<Run> pointLists;
+	private List<Run> runs;
 	
-	public ClusterRunResult
+	public ClusteringAlgorithmMultiRunningResult
 		(ClusteringAlgorithm algorithm, List<Run> pointLists) {
 		
 		this.algorithm = algorithm;
-		this.pointLists = pointLists;
+		this.runs = pointLists;
 	}
 
 	public ClusteringAlgorithm getAlgorithm() {
@@ -22,18 +22,18 @@ public class ClusterRunResult {
 		this.algorithm = algorithm;
 	}
 
-	public List<Run> getPointLists() {
-		return pointLists;
+	public List<Run> getRuns() {
+		return runs;
 	}
 
 	public void setPointLists(List<Run> pointLists) {
-		this.pointLists = pointLists;
+		this.runs = pointLists;
 	}
 	
 	public double[] getObjectiveFunctionSeries() {
-		double[] objectiveFunctionSeries = new double[pointLists.size()];
-		for (int i = 0; i < pointLists.size(); i++) {
-			objectiveFunctionSeries[i] = pointLists.get(i).getY();
+		double[] objectiveFunctionSeries = new double[runs.size()];
+		for (int i = 0; i < runs.size(); i++) {
+			objectiveFunctionSeries[i] = runs.get(i).getY();
 		}
 		return objectiveFunctionSeries;
 	}
