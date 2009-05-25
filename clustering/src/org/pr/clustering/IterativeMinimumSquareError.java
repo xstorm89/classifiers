@@ -30,7 +30,7 @@ public abstract class IterativeMinimumSquareError extends AbstractPartitioningAl
 		}
 		
 		
-		double newGlobalObjFun = getMeanSquareError(Z);
+		double newGlobalObjFun = getObjectiveFunction(Z);
 		double oldGlobalObjFun;
 		int numberOfStableIterations = 0;
 		for (int m = 0; ; m++) {
@@ -73,7 +73,7 @@ public abstract class IterativeMinimumSquareError extends AbstractPartitioningAl
 				}
 			}
 			
-			newGlobalObjFun = getMeanSquareError(Z);
+			newGlobalObjFun = getObjectiveFunction(Z);
 			// if the objective function is the same
 			// advance stability count
 			if (DoubleUtils.equal(newGlobalObjFun, oldGlobalObjFun)) {

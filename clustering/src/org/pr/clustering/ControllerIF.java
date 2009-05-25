@@ -9,7 +9,6 @@ public interface ControllerIF {
 		String dataFilename,
 		String delimeter,
 		boolean lastColumnIsLable,
-		int numRuns,
-		ClusteringAlgorithm... algorithms);
+		int numRuns);
 	
 }

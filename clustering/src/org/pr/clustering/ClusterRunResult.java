@@ -30,5 +30,13 @@ public class ClusterRunResult {
 		this.pointLists = pointLists;
 	}
 	
+	public double[] getObjectiveFunctionSeries() {
+		double[] objectiveFunctionSeries = new double[pointLists.size()];
+		for (int i = 0; i < pointLists.size(); i++) {
+			objectiveFunctionSeries[i] = pointLists.get(i).getY();
+		}
+		return objectiveFunctionSeries;
+	}
+	
 }
  
