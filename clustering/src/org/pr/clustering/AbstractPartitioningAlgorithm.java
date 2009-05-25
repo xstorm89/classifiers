@@ -36,7 +36,7 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 		return patternMemberships;
 	}
 	
-	public double getMeanSquareError() {
+	public double getObjectiveFunction() {
 		double globalError = 0;
 		List<Integer> clusters = mm.getClusters();
 		for (int i = 0; i < k; i++) {
@@ -90,7 +90,7 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 		return patterns;
 	}
 	
-	protected double getMeanSquareError(List<Vector> Z) {
+	protected double getObjectiveFunction(List<Vector> Z) {
 		double globalError = 0;
 		List<Integer> clusters = mm.getClusters();
 		for (int i = 0; i < k; i++) {

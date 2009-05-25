@@ -37,14 +37,16 @@ public class MainWindow extends Composite {
 	private Text inputFileText = null;
 	private Label label3 = null;
     
-	private Shell shell = null;
-	private Button goButton = null;
-	
-	ControllerIF controller = new ControllerImpl();
 	private Button lastColumnIsLabelCheckBox = null;
 	private Button tabRadioButton = null;
 	private Label label4 = null;
 	private Button spaceRadioButton = null;
+	
+	private Shell shell = null;
+	private Button goButton = null;
+	
+	ControllerIF controller = new ControllerImpl();
+	
 	public MainWindow(Composite parent, int style) {
 		super(parent, style);
 		initialize();
@@ -63,7 +65,7 @@ public class MainWindow extends Composite {
 					= new FileDialog(shell, SWT.OPEN);
 			    fd.setText("Open");
 			    fd.setFilterPath("C:/");
-			    String[] filterExt = {"*.txt","*.in","*.*"};
+			    String[] filterExt = {"*.in","*.txt","*.*"};
 			    fd.setFilterExtensions(filterExt);
 				inputFileText.setText(fd.open());
 			}
@@ -139,21 +141,23 @@ public class MainWindow extends Composite {
 				int k =  kCombo.getText() != null && ! kCombo.getText().equals("")
 					? Integer.valueOf(kCombo.getText())
 					: 0; 
-				double m = mText.getText() != null && ! mText.getText().equals("")
-					? Double.valueOf(mText.getText())
-					: 0;
-				double alpha = alphaText.getText() != null && ! alphaText.getText().equals("")
-					? Double.valueOf(alphaText.getText())
-					: 0;
+//				double m = mText.getText() != null && ! mText.getText().equals("")
+//					? Double.valueOf(mText.getText())
+//					: 0;
+//				double alpha = alphaText.getText() != null && ! alphaText.getText().equals("")
+//					? Double.valueOf(alphaText.getText())
+//					: 0;
 				String fileName = inputFileText.getText();
 				String delimeter = tabRadioButton.getSelection()
 					? "\t"
 					: " ";
 				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
-				AbstractClusteringAlgorithm clusteringAlgorithm 
-					= AbstractClusteringAlgorithm.Factory.create
-						(ClusteringAlgorithm.createAlgorithmByName(algorithm), k, m, alpha, fileName, delimeter, lastColumnIsLable);
-				clusteringAlgorithm.partition();
+//				AbstractClusteringAlgorithm clusteringAlgorithm 
+//					= AbstractClusteringAlgorithm.Factory.create
+//						(ClusteringAlgorithm.createAlgorithmByName(algorithm), k, m, alpha, fileName, delimeter, lastColumnIsLable);
+//				clusteringAlgorithm.partition();
+				
+				controller.doKMeansBenchmark(k, fileName, delimeter, lastColumnIsLable, 3);
 			}
 			
 		});
