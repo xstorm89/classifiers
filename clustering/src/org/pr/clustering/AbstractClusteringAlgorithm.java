@@ -96,21 +96,27 @@ public abstract class AbstractClusteringAlgorithm {
 			int k,
 			Vector... patterns) {
 		
-		if (clusteringAlgorithm.equals(ClusteringAlgorithm.KMeans))
-			return new KMeans(k, patterns);
-		else if (clusteringAlgorithm.equals(ClusteringAlgorithm.DHB))
-			return new DHBest(k, patterns);
-		else if (clusteringAlgorithm.equals(ClusteringAlgorithm.DHF))
-			return new DHFirst(k, patterns);
-		else if (clusteringAlgorithm.equals(ClusteringAlgorithm.ABF))
-			return new ABF(k, patterns);
-		else if (clusteringAlgorithm.equals(ClusteringAlgorithm.AFB))
-			return new AFB(k, patterns);
-		else
-			throw new IllegalArgumentException
-				("Algorithm " + clusteringAlgorithm.getName() + " is not supported (yet)");
+			if (clusteringAlgorithm.equals(ClusteringAlgorithm.KMeans))
+				return new KMeans(k, patterns);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.DHB))
+				return new DHBest(k, patterns);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.DHF))
+				return new DHFirst(k, patterns);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.ABF))
+				return new ABF(k, patterns);
+			else if (clusteringAlgorithm.equals(ClusteringAlgorithm.AFB))
+				return new AFB(k, patterns);
+			else
+				throw new IllegalArgumentException
+					("Algorithm " + clusteringAlgorithm.getName() + " is not supported (yet)");
+		}
 		
-	}
+		public static Hierarchical createHierachhicalAlgorithm
+			(LinkageCriterion linkageCriterion,
+			Vector... patterns) {
+		
+			return new Hierarchical(patterns, linkageCriterion);
+		}
 		
 		public static AbstractClusteringAlgorithm create
 			(ClusteringAlgorithm clusteringAlgorithm, 

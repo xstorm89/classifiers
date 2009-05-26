@@ -1,5 +1,6 @@
 package org.pr.clustering;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,9 +54,11 @@ public class Vector {
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("vector: " + name + " = [");
+		DecimalFormat format = new DecimalFormat("000.000");
+		
+		StringBuilder sb = new StringBuilder("[");
 		for (int i = 0; i < values.length; i++) {
-			sb.append(values[i]);
+			sb.append(format.format(values[i]));
 			if (i < values.length - 1)
 				sb.append(", ");
 		}

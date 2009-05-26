@@ -1,4 +1,5 @@
-#Mon May 25 04:04:18 EEST 2009
+#Tue May 26 03:30:42 EEST 2009
 eclipse.preferences.version=1
 encoding//src/org/pr/clustering/ControllerImpl.java=UTF-8
 encoding//src/org/pr/clustering/ui/ChartWindow.java=UTF-8
+encoding//src/org/pr/clustering/ui/ClusteringResultWindow.java=UTF-8
