@@ -8,22 +8,29 @@ import java.util.List;
  */
 public class Cluster {
 
-	Cluster left = null;
-	Cluster right = null;
+	public Cluster left = null;
+	public Cluster right = null;
 	List<Integer> patternIndexes;
 	
-	String name;
+	public double distanceBetweenLeftAndRightClusters;
+	
+	public String name;
+	
+	private static int counter = 0;
 	
 	public Cluster(String name, int patternIndex) {
 		this.name = name;
+		this.distanceBetweenLeftAndRightClusters = 0;
 		patternIndexes = new ArrayList<Integer>();
 		patternIndexes.add(patternIndex);
 	}
 	
-	public Cluster(Cluster left, Cluster right) {
+	public Cluster(Cluster left, Cluster right, double distanceBetweenLeftAndRightClusters) {
 		this.left = left;
 		this.right = right;
-		this.name = "[" + left.name + "," + right.name + "]";
+		// this.name = "[" + left.name + "," + right.name + "]";
+		this.name = "" + counter++;
+		this.distanceBetweenLeftAndRightClusters = distanceBetweenLeftAndRightClusters;
 		
 		patternIndexes = new ArrayList<Integer>();
 		for (Integer index : left.getPatternIndexes()) {
@@ -40,6 +47,6 @@ public class Cluster {
 	
 	@Override
 	public String toString() {
-		return name;
+		return this.name = "[" + left.name + "," + right.name + ": " + distanceBetweenLeftAndRightClusters + "]";
 	}
 }

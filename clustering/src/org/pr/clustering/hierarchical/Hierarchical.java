@@ -46,7 +46,7 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 			//  2. merging the clusters themselves that are stored in clusters list
 			sm.merge(distanceInfo.row, distanceInfo.column);
 			
-			Cluster newCluster = new Cluster(clusters.get(distanceInfo.row), clusters.get(distanceInfo.column));
+			Cluster newCluster = new Cluster(clusters.get(distanceInfo.row), clusters.get(distanceInfo.column), distanceInfo.distance);
 			clusters.remove(distanceInfo.column);
 			clusters.remove(distanceInfo.row);
 			clusters.add(distanceInfo.row, newCluster);
@@ -57,6 +57,10 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 		System.out.println(clusters.get(0));
 		
 		return null;
+	}
+	
+	public Cluster getRootCluster() {
+		return clusters.get(0);
 	}
 	
 	public static void main(String[] args) {
@@ -75,7 +79,7 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 		patternList.add(v4);
 		patternList.add(v5);
 		
-		Hierarchical hierarchical = new Hierarchical(patternList.toArray(new Vector[patternList.size()]), LinkageCriterion.WPGMC);
+		Hierarchical hierarchical = new Hierarchical(patternList.toArray(new Vector[patternList.size()]), LinkageCriterion.SINGLE);
 		hierarchical.partition();
 		
 	}

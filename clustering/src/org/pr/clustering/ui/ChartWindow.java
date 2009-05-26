@@ -79,7 +79,7 @@ public class ChartWindow {
 		formData1.right = new FormAttachment(30,-50);
 		formData1.left = new FormAttachment(0,50);
 		resultWindow = new Shell();
-		 resultWindow.setImage(new Image(Display.getCurrent(),"MathWorldIcon.gif"));
+		 resultWindow.setImage(new Image(Display.getCurrent(),"resources/MathWorldIcon.gif"));
 		resultWindow.setText("Hard Partitioning Algorithms");
 		resultWindow.setMaximized(true);
 		createChartComposite();

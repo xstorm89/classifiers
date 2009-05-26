@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.pr.clustering.ui;
 
 import java.awt.Frame;
@@ -27,14 +24,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.pr.clustering.hierarchical.Cluster;
 
 import sun.awt.image.codec.JPEGImageEncoderImpl;
 
 import com.sun.image.codec.jpeg.ImageFormatException;
 
-import data.Matrix;
 import ddraw.Dendrogram;
 import ddraw.Jif;
+import ddraw.Node;
 
 /**
  * @author Alaa
@@ -44,13 +42,16 @@ public class DendroWindow {
 
 	private Shell mainWindow = null;  //  @jve:decl-index=0:visual-constraint="10,10"
 	private Composite chartComposite = null;
-	private int n,m;
-	private Matrix x;  //  @jve:decl-index=0:
 	private Button saveImageButton = null;
-	private int method=0; //1 min, 2 max, 3 average, 4 mean
 	private Frame locationFrame;
 	private JDesktopPane desktop;
-	public DendroWindow(){
+	
+	private Cluster rootCluster;
+	
+	Shell shell = null;
+	
+	public DendroWindow(Cluster rootCluster) {
+		this.rootCluster = rootCluster;
 		createMainWindow();
 	}
 	/**
@@ -105,7 +106,7 @@ public class DendroWindow {
 		formData1.right = new FormAttachment(30,-50);
 		formData1.left = new FormAttachment(0,50);
 		mainWindow = new Shell();
-		mainWindow.setImage(new Image(Display.getCurrent(),"ClusterMaster.ico"));
+		mainWindow.setImage(new Image(Display.getCurrent(),"resources/MathWorldIcon.gif"));
 		mainWindow.setText("Hierarchical Clustering");
 		mainWindow.setMaximized(true);
 		createChartComposite();
@@ -130,66 +131,27 @@ public class DendroWindow {
 				});
 	}
 
-	public void setN(int n) {
-		this.n = n;
-	}
-
-	public void setM(int m) {
-		this.m = m;
-	}
-
-
-	public void setX(Matrix x) {
-		this.x = x;
-	}
-
 	public void enableSave() {
 		saveImageButton.setEnabled(true);
 	}
-	public void runOptions(int method){
-		//set parameters here
-		this.method = method;
+	
+	public JDesktopPane getDesktop() {
+		// TODO Auto-generated method stub
+		return desktop;
 	}
-
+	
+	public void open() {
+		// TODO Auto-generated method stub
+		mainWindow.open();
+	}
+	
 	public void run() {
-		//run
-		HierarchicalClustering algo=null;
-		String title = "Untitled";
-		switch(method) {
-		case 1:
-			algo = new SingleLink(n,m,x);
-			title = "Single Link";
-			break;
-		case 2:
-			algo = new CompleteLink(n,m,x);
-			title = "Complete Link";
-			break;
-		case 3:
-			algo = new UPGMA(n,m,x);
-			title = "UPGMA";
-			break;
-		case 4:
-			algo = new UPGMC(n,m,x);
-			title = "UPGMC";
-			break;
-		case 5:
-			algo = new WPGMA(n,m,x);
-			title = "WPGMA";
-			break;
-		case 6:
-			algo = new WPGMC(n,m,x);
-			title = "WPGMC";
-			break;
-		case 7:
-			algo = new Ward(n,m,x);
-			title = "Ward";
-			break;
-		}
-//		locationFrame.removeAll();
+		mainWindow.open();
+		JDesktopPane desktop = this.getDesktop();
 		Jif jif = new Jif();
-		algo.setDendro(jif.getDendro());
-		algo.loop();
-		jif.setup(new File(title));
+		fillDendro(jif.getDendro(), rootCluster);
+		jif.setSize(desktop.getSize());
+		jif.setup(new File("C:/dendroFile.jif"));
 		desktop.add(jif);
 		try {
 			jif.setSelected(true);
@@ -197,8 +159,28 @@ public class DendroWindow {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		locationFrame.repaint();
+		desktop.repaint();
+		this.enableSave();
+		// locationFrame.repaint();
+	}
+	
+	private void fillDendro(Dendrogram dendro, Cluster root) {
+		if(root.left == null) { // root.right would also equal null
+			dendro.getHash().put(root.name, new Node(root.name));
+			return;
+		}
+		
+		fillDendro(dendro, root.left);
+		fillDendro(dendro, root.right);
+		
+		Node newNode = new Node
+			((Node) dendro.getHash().get(root.left.name),
+			(Node) dendro.getHash().get(root.right.name),
+			root.left.name,
+			root.distanceBetweenLeftAndRightClusters);
 
+		dendro.getHash().put(root.name, newNode);
+		dendro.setLastNode(root.name);
 	}
 	
 	public void save(Dendrogram d,String filename){
@@ -230,22 +212,5 @@ public class DendroWindow {
 		d.paintComponent(g);
 		return bi;
 	}
-	public void open() {
-		// TODO Auto-generated method stub
-		mainWindow.open();
-	}
-	public JDesktopPane getDesktop() {
-		// TODO Auto-generated method stub
-		return desktop;
-	}
-
-//	private String format(double number){
-//		String string = Double.toString(number);
-//		try {
-//			string= string.substring(0, string.indexOf('.')+5);
-//		} catch (StringIndexOutOfBoundsException e) {
-//		}
-//		return string;
-//	}
 
 }
