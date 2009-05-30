@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -17,11 +15,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -81,8 +77,9 @@ public class MainWindow extends Composite {
 	private Text fuzzyKText = null;
 	private Button fuzzyGoButton = null;
 	private Button displayPatternsButton = null;
-	private Button closeButton = null;
+	private Button closeAllButton = null;
 	private Button kmeansDisplayClusterButton = null;
+	private Button closeButton = null;
 	public MainWindow(Composite parent, int style) {
 		super(parent, style);
 		initialize();
@@ -99,11 +96,30 @@ public class MainWindow extends Composite {
 		createDataSetGroup();
 		createHierarchicalGroup();
 		createFuzzyGroup();
+		closeAllButton = new Button(this, SWT.NONE);
+		closeAllButton.setBounds(new Rectangle(531, 463, 167, 26));
+		closeAllButton.setToolTipText("close all open windows");
+		closeAllButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
+		closeAllButton.setText("Close Result Windows");
+		closeAllButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				for (Closeable closeable : openWindows) {
+					closeable.close();
+				}
+				openWindows.clear();
+				controller.closeAllOpenWindows();
+			}
+		});
 		closeButton = new Button(this, SWT.NONE);
-		closeButton.setBounds(new Rectangle(703, 465, 86, 26));
-		closeButton.setToolTipText("close all open windows");
+		closeButton.setText("Close");
+		closeButton.setSize(new Point(86, 26));
 		closeButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		closeButton.setText("Close All");
+		closeButton.setLocation(new Point(703, 463));
 		closeButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -178,9 +194,13 @@ public class MainWindow extends Composite {
 		partitioningGoButton.setLocation(new Point(166, 171));
 		partitioningGoButton.setSize(new Point(95, 24));
 		partitioningGoButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		partitioningGoButton.addListener(SWT.MouseUp, new Listener(){
+		partitioningGoButton.addSelectionListener(new SelectionListener() {
 			@Override
-			public void handleEvent(Event event) {
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
 				List<ClusteringAlgorithm> algorithms = new ArrayList<ClusteringAlgorithm>();
 				if (kMeansCheckBox.getSelection())
 					algorithms.add(ClusteringAlgorithm.KMeans);
@@ -204,62 +224,67 @@ public class MainWindow extends Composite {
 					? Integer.valueOf(numOfRunsText.getText())
 					: 5; 
 				controller.doKMeansBenchmark(algorithms, k, fileName, delimeter, lastColumnIsLable, numberOfRuns);
-			}});
-		
+			}
+		});
 		kmeansDisplayClusterButton = new Button(hardPartitioningGroup, SWT.NONE);
 		kmeansDisplayClusterButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
 		kmeansDisplayClusterButton.setLocation(new Point(268, 172));
 		kmeansDisplayClusterButton.setSize(new Point(108, 24));
 		kmeansDisplayClusterButton.setText("Display Clusters");
-		kmeansDisplayClusterButton.addListener(SWT.MouseUp, new Listener(){
+		kmeansDisplayClusterButton.addSelectionListener(new SelectionListener() {
 			@Override
-			public void handleEvent(Event event) {
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
 				int k = kCombo.getText() != null && ! kCombo.getText().equals("")
-					? Integer.valueOf(kCombo.getText())
-					: 0; 
-				String fileName = inputFileText.getText();
-				String delimeter = tabRadioButton.getSelection()
-					? "\t"
-					: " ";
-				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
-					
-				Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
-					
-				AbstractPartitioningAlgorithm algorithm = null;
-				if (kMeansCheckBox.getSelection())
-					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.KMeans, k, patterns);
-				else if (dHFCheckBox.getSelection())
-					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHF, k, patterns);
-				else if (dHBCheckBox.getSelection())
-					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHB, k, patterns);
-				else if (aFBCheckBox.getSelection())
-					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.AFB, k, patterns);
-				else if (aBFCheckBox.getSelection())
-					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.ABF, k, patterns);
-				else {
-					MessageBox mb = new MessageBox(shell, SWT.OK | SWT.ERROR);
-					mb.setText("Error Clustering Patterns!");
-					mb.setMessage("You must select an algorithm first!");
-					mb.open();
-					return;
-				}
-					
-				algorithm.partition();
-				PatternMembership[] patternMemberships = algorithm.getClusteringResult();
+				? Integer.valueOf(kCombo.getText())
+				: 0; 
+			String fileName = inputFileText.getText();
+			String delimeter = tabRadioButton.getSelection()
+				? "\t"
+				: " ";
+			boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
 				
-				List<List<Vector>> patternsList = new ArrayList<List<Vector>>();
-				for (int i = 0; i < k; i++) {
-					patternsList.add(new ArrayList<Vector>());
-				}
+			Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
 				
-				for (int i = 0; i < patternMemberships.length; i++) {
-					patternsList.get(patternMemberships[i].cluster).add(patternMemberships[i].pattern);
-				}
+			AbstractPartitioningAlgorithm algorithm = null;
+			if (kMeansCheckBox.getSelection())
+				algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.KMeans, k, patterns);
+			else if (dHFCheckBox.getSelection())
+				algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHF, k, patterns);
+			else if (dHBCheckBox.getSelection())
+				algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHB, k, patterns);
+			else if (aFBCheckBox.getSelection())
+				algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.AFB, k, patterns);
+			else if (aBFCheckBox.getSelection())
+				algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.ABF, k, patterns);
+			else {
+				MessageBox mb = new MessageBox(shell, SWT.OK | SWT.ERROR);
+				mb.setText("Error Clustering Patterns!");
+				mb.setMessage("You must select an algorithm first!");
+				mb.open();
+				return;
+			}
 				
-				MultiClusterDisplayer multiClusterDisplayer = new MultiClusterDisplayer(patternsList);
-				openWindows.add(multiClusterDisplayer);
-				multiClusterDisplayer.displayClusters();
-			}});
+			algorithm.partition();
+			PatternMembership[] patternMemberships = algorithm.getClusteringResult();
+			
+			List<List<Vector>> patternsList = new ArrayList<List<Vector>>();
+			for (int i = 0; i < k; i++) {
+				patternsList.add(new ArrayList<Vector>());
+			}
+			
+			for (int i = 0; i < patternMemberships.length; i++) {
+				patternsList.get(patternMemberships[i].cluster).add(patternMemberships[i].pattern);
+			}
+			
+			MultiClusterDisplayer multiClusterDisplayer = new MultiClusterDisplayer(patternsList);
+			openWindows.add(multiClusterDisplayer);
+			multiClusterDisplayer.displayClusters();
+			}
+		});
 	}
 
 	/**
@@ -280,14 +305,19 @@ public class MainWindow extends Composite {
 		BrowseButton.setBounds(new Rectangle(258, 23, 116, 24));
 		BrowseButton.setText("Browse");
 		BrowseButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		BrowseButton.addMouseListener(new MouseListener(){
+		BrowseButton.addSelectionListener(new SelectionListener() {
 			@Override
-			public void mouseUp(MouseEvent e) {
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
 				FileDialog fd 
 					= new FileDialog(shell, SWT.OPEN);
 			    fd.setText("Open");
 			    fd.setFilterPath("F:/Masters/Pattern Recognition/Datasets");
-			    String[] filterExt = {"*.txt","*.in","*.*"};
+			    // String[] filterExt = {"*.txt","*.in","*.*"};
+			    String[] filterExt = {"*.*"};
 			    fd.setFilterExtensions(filterExt);
 				inputFileText.setText(fd.open());
 				if (inputFileText.getText() != null && ! inputFileText.getText().equals("")) {
@@ -295,15 +325,6 @@ public class MainWindow extends Composite {
 				} else 
 					displayPatternsButton.setEnabled(false);
 			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseDown(MouseEvent e) {
-			}
-			
 		});
 
 		label4 = new Label(dataSetGroup, SWT.NONE);
@@ -412,9 +433,13 @@ public class MainWindow extends Composite {
 		hierarchicalGoButton.setLocation(new Point(267, 144));
 		hierarchicalGoButton.setSize(new Point(108, 24));
 		hierarchicalGoButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		hierarchicalGoButton.addListener(SWT.MouseUp, new Listener(){
+		hierarchicalGoButton.addSelectionListener(new SelectionListener() {
 			@Override
-			public void handleEvent(Event event) {
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
 				LinkageCriterion linkageCriterion = null;  
 				if (singleLinkRadioButton.getSelection())
 					linkageCriterion = LinkageCriterion.SINGLE;

@@ -150,7 +150,7 @@ public class ControllerImpl implements ControllerIF {
 				(SeriesType.LINE, "KMeans (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
 			kMeansSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			kMeansSeries.setLineColor(new Color(Display.getDefault(), new RGB(255, 0, 0)));
-			kMeansSeries.setLineWidth(10);
+			kMeansSeries.setLineWidth(2);
 			kMeansSeries.setSymbolType(PlotSymbolType.CIRCLE);
 		}
 		
@@ -160,7 +160,7 @@ public class ControllerImpl implements ControllerIF {
 				(SeriesType.LINE, "DHF (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
 			DHFSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			DHFSeries.setLineColor(new Color(Display.getDefault(), new RGB(0, 0, 255)));
-			DHFSeries.setLineWidth(8);
+			DHFSeries.setLineWidth(2);
 			DHFSeries.setSymbolType(PlotSymbolType.PLUS);
 		}
 
@@ -170,7 +170,7 @@ public class ControllerImpl implements ControllerIF {
 				(SeriesType.LINE, "DHB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
 			DHBSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			DHBSeries.setLineColor(new Color(Display.getDefault(), new RGB(0, 128, 0)));
-			DHBSeries.setLineWidth(6);
+			DHBSeries.setLineWidth(2);
 			DHBSeries.setSymbolType(PlotSymbolType.CROSS);
 		}
 		
@@ -180,7 +180,7 @@ public class ControllerImpl implements ControllerIF {
 				(SeriesType.LINE, "AFB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
 			AFBSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			AFBSeries.setLineColor(new Color(Display.getDefault(), new RGB(255, 128, 0)));
-			AFBSeries.setLineWidth(4);
+			AFBSeries.setLineWidth(2);
 			AFBSeries.setSymbolType(PlotSymbolType.TRIANGLE);
 		}
 		

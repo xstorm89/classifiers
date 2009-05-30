@@ -11,16 +11,24 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 
 	int k;
 	Vector[] patterns;
-	MembershipMatrix mm;
+	HardPartitioningMembershipMatrix mm;
 	
 	List<Vector> cluserCenters;
 
 	private ClusteringAlgorithm type;
 	
+	protected int[] clusterSizes;
+	
 	public AbstractPartitioningAlgorithm(int k, Vector[] patterns, ClusteringAlgorithm type) {
 		this.k = k;
 		this.patterns = patterns;
-		mm = new MembershipMatrix(patterns.length, k);
+		mm = new HardPartitioningMembershipMatrix(patterns.length, k);
+
+		clusterSizes = new int[k];
+		for (int i = 0; i < patterns.length; i++) {
+			int clusterIndex = mm.getClusterForPattern(i);
+			clusterSizes[clusterIndex]++;
+		}
 		
 		this.type = type;
 	}
