@@ -2,6 +2,7 @@ package org.pr.clustering.hierarchical;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import org.pr.clustering.Vector;
 
@@ -52,6 +53,8 @@ public class SparseMatrix {
 	
 	public final double average;  
 		
+	public PriorityQueue<DistanceInfo> distancesQueue = new PriorityQueue<DistanceInfo>();
+	
 	public SparseMatrix(Vector[] patterns, LinkageCriterion linkageCriterion) {
 		this.linkageCriterion = linkageCriterion;
 		distanceFactorCalculator = DistanceFactorCalculator.Factory.create(linkageCriterion);
@@ -65,7 +68,8 @@ public class SparseMatrix {
 		double sum = 0;
 		for (int row = 0; row < patterns.length; row++) {
 			for (int col = 0; col < row; col++) {
-				double distance = Vector.euclideanDistance(patterns[row], patterns[col]); 
+				double distance = Vector.euclideanDistance(patterns[row], patterns[col]);
+				distancesQueue.add(new DistanceInfo(distance, row, col));
 				sum += distance;
 				counter++;
 				rows.get(row).add(distance);
@@ -134,9 +138,9 @@ public class SparseMatrix {
 	}
 	
 	public class DistanceInfo implements Comparable<DistanceInfo> {
-		double distance;
-		int row; 
-		int column;
+		public final double distance;
+		public final int row; 
+		public final int column;
 		
 		DistanceInfo (double distance, int row, int column) {
 			this.distance = distance;

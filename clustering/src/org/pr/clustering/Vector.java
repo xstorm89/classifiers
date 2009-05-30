@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * @author Ahmad
  */
-public class Vector {
+public class Vector implements Cloneable {
 
 	private double EPSILON = 0.000000001;
 	
-	private double[] values;
+	public double[] values;
 	
 	private String name = "un-named";
 	
@@ -121,4 +121,15 @@ public class Vector {
 	public double getDimension(int dimIndex) {
 		return values[dimIndex];
 	}
+
+	@Override
+	public Object clone() {
+		double[] _values = new double[values.length];
+		for (int i = 0; i < values.length; i++) {
+			_values[i] = values[i]; 
+		}
+		// TODO Auto-generated method stub
+		return new Vector(_values);
+	}
+	
 }
