@@ -5,8 +5,8 @@ package org.pr.clustering;
  */
 public class PatternMembership {
 
-	Vector pattern;
-	int cluster;
+	public final Vector pattern;
+	public final int cluster;
 	
 	public PatternMembership(Vector pattern, int cluster) {
 		this.cluster = cluster;

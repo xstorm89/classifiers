@@ -6,7 +6,7 @@ package org.pr.clustering.util;
  */
 public class DoubleUtils {
 
-	public static final double EPSILON = 0.000000000000001;
+	public static final double EPSILON = 0.001;
 	
 	public static boolean equal(double first, double second) {
 		return equal(first, second, EPSILON);

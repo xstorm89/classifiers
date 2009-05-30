@@ -20,6 +20,8 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 	
 	List<Cluster> clusters;
 	
+	SparseMatrix sm;
+	
 	public Hierarchical(Vector[] patterns, LinkageCriterion linkageCriterion) {
 		this.patterns = patterns;
 		this.linkageCriterion = linkageCriterion;
@@ -32,7 +34,7 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 			clusters.add(new Cluster("C" + i, i));
 		}
 
-		SparseMatrix sm = new SparseMatrix(patterns, linkageCriterion);
+		sm = new SparseMatrix(patterns, linkageCriterion);
 		
 		int iterationCount = 0;
 		for (DistanceInfo distanceInfo = sm.getClosestPair(); 
@@ -61,6 +63,15 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 	
 	public Cluster getRootCluster() {
 		return clusters.get(0);
+	}
+	
+	public void adjustRange() {
+		double factor;
+		if(this.sm.average < 100000)
+			factor = .08;
+		else
+			factor = .01;
+		getRootCluster().scale(factor);
 	}
 	
 	public static void main(String[] args) {

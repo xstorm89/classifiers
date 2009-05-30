@@ -22,11 +22,16 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.pr.clustering.AbstractClusteringAlgorithm;
+import org.pr.clustering.AbstractPartitioningAlgorithm;
 import org.pr.clustering.ClusteringAlgorithm;
 import org.pr.clustering.ControllerIF;
 import org.pr.clustering.ControllerImpl;
+import org.pr.clustering.PatternMembership;
+import org.pr.clustering.Vector;
 import org.pr.clustering.hierarchical.LinkageCriterion;
 
 public class MainWindow extends Composite {
@@ -41,6 +46,7 @@ public class MainWindow extends Composite {
 	
 	private Shell shell = null;
 	private int style;
+	List<Closeable> openWindows = new ArrayList<Closeable>();
 	
 	ControllerIF controller = new ControllerImpl();
 	private Group hardPartitioningGroup = null;  //  @jve:decl-index=0:visual-constraint="14,661"
@@ -74,6 +80,9 @@ public class MainWindow extends Composite {
 	private Label label2 = null;
 	private Text fuzzyKText = null;
 	private Button fuzzyGoButton = null;
+	private Button displayPatternsButton = null;
+	private Button closeButton = null;
+	private Button kmeansDisplayClusterButton = null;
 	public MainWindow(Composite parent, int style) {
 		super(parent, style);
 		initialize();
@@ -84,12 +93,32 @@ public class MainWindow extends Composite {
 
 	private void initialize() {
 		this.setFont(new Font(Display.getDefault(), "Calibri", 12, SWT.NORMAL));
-		setSize(new Point(810, 648));
+		setSize(new Point(798, 498));
 		setLayout(null);
 		createHardPartitioningGroup();
 		createDataSetGroup();
 		createHierarchicalGroup();
 		createFuzzyGroup();
+		closeButton = new Button(this, SWT.NONE);
+		closeButton.setBounds(new Rectangle(703, 465, 86, 26));
+		closeButton.setToolTipText("close all open windows");
+		closeButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
+		closeButton.setText("Close All");
+		closeButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				for (Closeable closeable : openWindows) {
+					closeable.close();
+				}
+				openWindows.clear();
+				controller.closeAllOpenWindows();
+				shell.close();
+			}
+		});
 	}
 
 	/**
@@ -101,7 +130,7 @@ public class MainWindow extends Composite {
 		hardPartitioningGroup.setLayout(null);
 		hardPartitioningGroup.setText("Partitioning Algorithms");
 		hardPartitioningGroup.setFont(new Font(Display.getDefault(), "Calibri", 12, SWT.NORMAL));
-		hardPartitioningGroup.setBounds(new Rectangle(9, 125, 383, 174));
+		hardPartitioningGroup.setBounds(new Rectangle(9, 125, 383, 201));
 		kMeansCheckBox = new Button(hardPartitioningGroup, SWT.CHECK);
 		kMeansCheckBox.setBounds(new Rectangle(8, 26, 121, 16));
 		kMeansCheckBox.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
@@ -145,8 +174,9 @@ public class MainWindow extends Composite {
 		label5.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
 		label5.setText("Number of Runs:");
 		partitioningGoButton = new Button(hardPartitioningGroup, SWT.NONE);
-		partitioningGoButton.setBounds(new Rectangle(301, 138, 77, 23));
-		partitioningGoButton.setText("Go >>");
+		partitioningGoButton.setText("Do Benchmark");
+		partitioningGoButton.setLocation(new Point(166, 171));
+		partitioningGoButton.setSize(new Point(95, 24));
 		partitioningGoButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
 		partitioningGoButton.addListener(SWT.MouseUp, new Listener(){
 			@Override
@@ -175,6 +205,61 @@ public class MainWindow extends Composite {
 					: 5; 
 				controller.doKMeansBenchmark(algorithms, k, fileName, delimeter, lastColumnIsLable, numberOfRuns);
 			}});
+		
+		kmeansDisplayClusterButton = new Button(hardPartitioningGroup, SWT.NONE);
+		kmeansDisplayClusterButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
+		kmeansDisplayClusterButton.setLocation(new Point(268, 172));
+		kmeansDisplayClusterButton.setSize(new Point(108, 24));
+		kmeansDisplayClusterButton.setText("Display Clusters");
+		kmeansDisplayClusterButton.addListener(SWT.MouseUp, new Listener(){
+			@Override
+			public void handleEvent(Event event) {
+				int k = kCombo.getText() != null && ! kCombo.getText().equals("")
+					? Integer.valueOf(kCombo.getText())
+					: 0; 
+				String fileName = inputFileText.getText();
+				String delimeter = tabRadioButton.getSelection()
+					? "\t"
+					: " ";
+				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
+					
+				Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
+					
+				AbstractPartitioningAlgorithm algorithm = null;
+				if (kMeansCheckBox.getSelection())
+					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.KMeans, k, patterns);
+				else if (dHFCheckBox.getSelection())
+					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHF, k, patterns);
+				else if (dHBCheckBox.getSelection())
+					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.DHB, k, patterns);
+				else if (aFBCheckBox.getSelection())
+					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.AFB, k, patterns);
+				else if (aBFCheckBox.getSelection())
+					algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(ClusteringAlgorithm.ABF, k, patterns);
+				else {
+					MessageBox mb = new MessageBox(shell, SWT.OK | SWT.ERROR);
+					mb.setText("Error Clustering Patterns!");
+					mb.setMessage("You must select an algorithm first!");
+					mb.open();
+					return;
+				}
+					
+				algorithm.partition();
+				PatternMembership[] patternMemberships = algorithm.getClusteringResult();
+				
+				List<List<Vector>> patternsList = new ArrayList<List<Vector>>();
+				for (int i = 0; i < k; i++) {
+					patternsList.add(new ArrayList<Vector>());
+				}
+				
+				for (int i = 0; i < patternMemberships.length; i++) {
+					patternsList.get(patternMemberships[i].cluster).add(patternMemberships[i].pattern);
+				}
+				
+				MultiClusterDisplayer multiClusterDisplayer = new MultiClusterDisplayer(patternsList);
+				openWindows.add(multiClusterDisplayer);
+				multiClusterDisplayer.displayClusters();
+			}});
 	}
 
 	/**
@@ -188,7 +273,7 @@ public class MainWindow extends Composite {
 		dataSetGroup.setFont(new Font(Display.getDefault(), "Calibri", 12, SWT.NORMAL));
 		dataSetGroup.setBounds(new Rectangle(7, 6, 384, 111));
 		
-		inputFileText = new Text(dataSetGroup, SWT.BORDER);
+		inputFileText = new Text(dataSetGroup, SWT.BORDER | SWT.READ_ONLY);
 		inputFileText.setBounds(new Rectangle(14, 24, 239, 21));
 		
 		BrowseButton = new Button(dataSetGroup, SWT.NONE);
@@ -202,9 +287,13 @@ public class MainWindow extends Composite {
 					= new FileDialog(shell, SWT.OPEN);
 			    fd.setText("Open");
 			    fd.setFilterPath("F:/Masters/Pattern Recognition/Datasets");
-			    String[] filterExt = {"*.in","*.txt","*.*"};
+			    String[] filterExt = {"*.txt","*.in","*.*"};
 			    fd.setFilterExtensions(filterExt);
 				inputFileText.setText(fd.open());
+				if (inputFileText.getText() != null && ! inputFileText.getText().equals("")) {
+					displayPatternsButton.setEnabled(true);
+				} else 
+					displayPatternsButton.setEnabled(false);
 			}
 
 			@Override
@@ -231,6 +320,7 @@ public class MainWindow extends Composite {
 		tabRadioButton = new Button(dataSetGroup, SWT.RADIO);
 		tabRadioButton.setBounds(new Rectangle(92, 55, 43, 21));
 		tabRadioButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
+		tabRadioButton.setSelection(true);
 		tabRadioButton.setText("TAB");
 		
 		spaceRadioButton = new Button(dataSetGroup, SWT.RADIO);
@@ -241,7 +331,41 @@ public class MainWindow extends Composite {
 		commaRadioButton.setBounds(new Rectangle(200, 55, 67, 18));
 		commaRadioButton.setText("COMMA");
 		commaRadioButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		
+		displayPatternsButton = new Button(dataSetGroup, SWT.NONE);
+		displayPatternsButton.setBounds(new Rectangle(268, 80, 106, 25));
+		displayPatternsButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
+		displayPatternsButton.setEnabled(false);
+		displayPatternsButton.setToolTipText("Display 2D patterns");
+		displayPatternsButton.setText("Display Patterns");
+		displayPatternsButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				widgetSelected(arg0);
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				String fileName = inputFileText.getText();
+				String delimeter = tabRadioButton.getSelection()
+					? "\t"
+					: spaceRadioButton.getSelection()
+						? " "
+						: ",";
+				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
+				Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
+				if (patterns.length > 0 && patterns[0].getDimensionCount() == 2) {
+					PatternDisplayer patternDisplayer = new PatternDisplayer(patterns);
+					openWindows.add(patternDisplayer);
+					patternDisplayer.showPatterns();
+				}
+				else {
+					MessageBox mb = new MessageBox(shell, SWT.OK | SWT.ERROR);
+					mb.setText("I can only display 2D patterns!");
+					mb.setMessage("I can only display 2D patterns!");
+					mb.open();
+					return;
+				}
+			}
+		});
 	}
 
 	/**
@@ -284,9 +408,9 @@ public class MainWindow extends Composite {
 		wardRadioButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
 		wardRadioButton.setText("Ward");
 		hierarchicalGoButton = new Button(hierarchicalGroup, SWT.NONE);
-		hierarchicalGoButton.setText("Go >>");
-		hierarchicalGoButton.setLocation(new Point(302, 137));
-		hierarchicalGoButton.setSize(new Point(77, 23));
+		hierarchicalGoButton.setText("Displaye Clusters");
+		hierarchicalGoButton.setLocation(new Point(267, 144));
+		hierarchicalGoButton.setSize(new Point(108, 24));
 		hierarchicalGoButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
 		hierarchicalGoButton.addListener(SWT.MouseUp, new Listener(){
 			@Override
@@ -326,7 +450,7 @@ public class MainWindow extends Composite {
 		fuzzyGroup.setLayout(null);
 		fuzzyGroup.setText("Fuzzy and Soft Algorithms");
 		fuzzyGroup.setFont(new Font(Display.getDefault(), "Calibri", 12, SWT.NORMAL));
-		fuzzyGroup.setBounds(new Rectangle(8, 311, 388, 147));
+		fuzzyGroup.setBounds(new Rectangle(7, 342, 388, 147));
 		fuzzyRadioButton = new Button(fuzzyGroup, SWT.RADIO);
 		fuzzyRadioButton.setBounds(new Rectangle(18, 30, 97, 18));
 		fuzzyRadioButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
@@ -380,9 +504,9 @@ public class MainWindow extends Composite {
 		fuzzyKText.setBounds(new Rectangle(56, 59, 70, 21));
 		fuzzyGoButton = new Button(fuzzyGroup, SWT.NONE);
 		fuzzyGoButton.setFont(new Font(Display.getDefault(), "Calibri", 10, SWT.NORMAL));
-		fuzzyGoButton.setLocation(new Point(303, 114));
-		fuzzyGoButton.setSize(new Point(77, 23));
-		fuzzyGoButton.setText("Go >>");
+		fuzzyGoButton.setLocation(new Point(274, 114));
+		fuzzyGoButton.setSize(new Point(108, 24));
+		fuzzyGoButton.setText("Display Clusters");
 		fuzzyGoButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
@@ -407,10 +531,14 @@ public class MainWindow extends Composite {
 				
 				if (fuzzyRadioButton.getSelection()) {
 					String result = controller.runFuzzyKMeansAlgorithm(k, m, fileName, delimeter, lastColumnIsLable);
-					new ClusteringResultWindow("Fuzzy K-Means Clustering", result).open();
+					ClusteringResultWindow clusteringResultWindow = new ClusteringResultWindow("Fuzzy K-Means Clustering", result);
+					openWindows.add(clusteringResultWindow);
+					clusteringResultWindow.open();
 				} else {
 					String result = controller.runSoftKMeansAlgorithm(k, m, alpha, fileName, delimeter, lastColumnIsLable);
-					new ClusteringResultWindow("Soft K-Means Clustering", result).open();
+					ClusteringResultWindow clusteringResultWindow = new ClusteringResultWindow("Soft K-Means Clustering", result);
+					openWindows.add(clusteringResultWindow);
+					clusteringResultWindow.open();
 				}
 			}
 

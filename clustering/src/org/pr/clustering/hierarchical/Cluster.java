@@ -45,6 +45,14 @@ public class Cluster {
 		return patternIndexes;
 	}
 	
+	public void scale(double factor) {
+		distanceBetweenLeftAndRightClusters /= factor;
+		if(left != null)
+			left.scale(factor);
+		if(right != null)
+			right.scale(factor);
+	}
+	
 	@Override
 	public String toString() {
 		return this.name = "[" + left.name + "," + right.name + ": " + distanceBetweenLeftAndRightClusters + "]";

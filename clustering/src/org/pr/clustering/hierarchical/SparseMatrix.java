@@ -50,6 +50,8 @@ public class SparseMatrix {
 	
 	DistanceFactorCalculator distanceFactorCalculator; 
 	
+	public final double average;  
+		
 	public SparseMatrix(Vector[] patterns, LinkageCriterion linkageCriterion) {
 		this.linkageCriterion = linkageCriterion;
 		distanceFactorCalculator = DistanceFactorCalculator.Factory.create(linkageCriterion);
@@ -59,12 +61,18 @@ public class SparseMatrix {
 			rows.add(new ArrayList<Double>());
 		}
 		
+		int counter = 0;
+		double sum = 0;
 		for (int row = 0; row < patterns.length; row++) {
 			for (int col = 0; col < row; col++) {
 				double distance = Vector.euclideanDistance(patterns[row], patterns[col]); 
+				sum += distance;
+				counter++;
 				rows.get(row).add(distance);
 			}
 		}
+		
+		average = sum / (double)counter;
 	}
 	
 	private double getCell(int row, int column) {
@@ -230,12 +238,12 @@ public class SparseMatrix {
 
 		@Override
 		public double getAlphaR(int nr, int ns, int nk) {
-			return nr / (nr + ns);
+			return (double)nr / (double)(nr + ns);
 		}
 
 		@Override
 		public double getAlphaS(int nr, int ns, int nk) {
-			return ns / (nr + ns);
+			return (double)ns / (double)(nr + ns);
 		}
 
 		@Override
@@ -278,17 +286,17 @@ public class SparseMatrix {
 
 		@Override
 		public double getAlphaR(int nr, int ns, int nk) {
-			return nr / (nr + ns);
+			return (double)nr / (double)(nr + ns);
 		}
 
 		@Override
 		public double getAlphaS(int nr, int ns, int nk) {
-			return ns / (nr + ns);
+			return (double)ns / (double)(nr + ns);
 		}
 
 		@Override
 		public double getBeta(int nr, int ns, int nk) {
-			return (-1 * nr * ns) / ((nr + ns) * (nr + ns));
+			return (double)(-1 * nr * ns) / (double)((nr + ns) * (nr + ns));
 		}
 
 		@Override
@@ -326,17 +334,17 @@ public class SparseMatrix {
 
 		@Override
 		public double getAlphaR(int nr, int ns, int nk) {
-			return (nr + nk) / (nr + ns + nk);
+			return (double)(nr + nk) / (double)(nr + ns + nk);
 		}
 
 		@Override
 		public double getAlphaS(int nr, int ns, int nk) {
-			return (ns + nk) / (nr + ns + nk);
+			return (double)(ns + nk) / (double)(nr + ns + nk);
 		}
 
 		@Override
 		public double getBeta(int nr, int ns, int nk) {
-			return (-1 * nk) / (nr + ns + nk);
+			return (double)(-1 * nk) / (double)(nr + ns + nk);
 		}
 
 		@Override
