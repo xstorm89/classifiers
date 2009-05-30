@@ -22,7 +22,7 @@ import org.swtchart.Chart;
 /**
  * @author Alaa
  */
-public class ChartWindow {
+public class ChartWindow implements Closeable {
 
 	private Shell resultWindow = null;  //  @jve:decl-index=0:visual-constraint="56,71"
 	private Chart chart = null;
@@ -46,6 +46,22 @@ public class ChartWindow {
 		chart.getAxisSet().getYAxis(0).getTitle().setText("Objective Function");
 	}
 
+	public void setWindowTitle(String title) {
+		resultWindow.setText(title);
+	}
+	
+	public void setChartTitle(String title) {
+		chart.getTitle().setText(title);
+	}
+	
+	public void setXAxixTitle(String title) {
+		chart.getAxisSet().getXAxis(0).getTitle().setText(title);
+	}
+	
+	public void setYAxixTitle(String title) {
+		chart.getAxisSet().getYAxis(0).getTitle().setText(title);
+	}
+	
 	/**
 	 * This method initializes chartComposite	
 	 *
@@ -79,7 +95,7 @@ public class ChartWindow {
 		formData1.right = new FormAttachment(30,-50);
 		formData1.left = new FormAttachment(0,50);
 		resultWindow = new Shell();
-		 resultWindow.setImage(new Image(Display.getCurrent(),"resources/MathWorldIcon.gif"));
+		resultWindow.setImage(new Image(Display.getCurrent(),"resources/MathWorldIcon.gif"));
 		resultWindow.setText("Hard Partitioning Algorithms");
 		resultWindow.setMaximized(true);
 		createChartComposite();
@@ -135,6 +151,12 @@ public class ChartWindow {
 	public Chart getChart() {
 		// TODO Auto-generated method stub
 		return chart;
+	}
+	
+	@Override
+	public void close() {
+		if (resultWindow != null && resultWindow.isVisible())
+			resultWindow.close();
 	}
 
 }

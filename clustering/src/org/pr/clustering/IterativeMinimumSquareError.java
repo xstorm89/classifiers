@@ -9,6 +9,8 @@ import org.pr.clustering.util.DoubleUtils;
 
 public abstract class IterativeMinimumSquareError extends AbstractPartitioningAlgorithm {
 	
+	public static int MAX_ITERATIONS = 10000;
+	
 	public IterativeMinimumSquareError(int k, Vector[] patterns, ClusteringAlgorithm type) {
 		super(k, patterns, type);
 	}
@@ -33,6 +35,7 @@ public abstract class IterativeMinimumSquareError extends AbstractPartitioningAl
 		double newGlobalObjFun = getObjectiveFunction(Z);
 		double oldGlobalObjFun;
 		int numberOfStableIterations = 0;
+		// for (int m = 0; m < MAX_ITERATIONS; m++) {
 		for (int m = 0; ; m++) {
 			oldGlobalObjFun = newGlobalObjFun;
 			
@@ -43,7 +46,7 @@ public abstract class IterativeMinimumSquareError extends AbstractPartitioningAl
 				int i = mm.getClusterForPattern(l);
 				int[] iPatterns = mm.getPatternsForCluster(i);
 				if (iPatterns.length > 1) {
-					double gain = (iPatterns.length / (iPatterns.length - 1))
+					double gain = (((double)iPatterns.length) / (double)(iPatterns.length - 1))
 						* Vector.euclideanDistance(patterns[l], Z.get(i));
 					
 					double minCost = Double.MAX_VALUE;
@@ -78,7 +81,8 @@ public abstract class IterativeMinimumSquareError extends AbstractPartitioningAl
 			// advance stability count
 			if (DoubleUtils.equal(newGlobalObjFun, oldGlobalObjFun)) {
 				numberOfStableIterations++;
-				if (numberOfStableIterations == patterns.length) { // we're done
+				// if (numberOfStableIterations == patterns.length) { // we're done
+				if (numberOfStableIterations == 3) { // we're done
 					break;
 				}
 			} else

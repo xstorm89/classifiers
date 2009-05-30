@@ -36,5 +36,5 @@ public interface ControllerIF {
 		String delimeter,
 		boolean lastColumnIsLable);
 		
-	
+	public void closeAllOpenWindows();
 }

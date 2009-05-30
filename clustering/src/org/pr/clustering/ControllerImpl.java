@@ -12,7 +12,9 @@ import org.pr.clustering.hierarchical.LinkageCriterion;
 import org.pr.clustering.soft.FuzzyCMeans;
 import org.pr.clustering.soft.SoftKMeans;
 import org.pr.clustering.ui.ChartWindow;
+import org.pr.clustering.ui.Closeable;
 import org.pr.clustering.ui.DendroWindow;
+import org.pr.clustering.util.DurationUtils;
 import org.swtchart.Chart;
 import org.swtchart.IAxisSet;
 import org.swtchart.ILineSeries;
@@ -24,6 +26,8 @@ import org.swtchart.ISeries.SeriesType;
 public class ControllerImpl implements ControllerIF {
 
 	int numberOfRuns = 20;
+	
+	List<Closeable> openWindows = new ArrayList<Closeable>();
 	
 	@Override
 	public List<ClusteringAlgorithmMultiRunningResult> doKMeansBenchmark
@@ -39,11 +43,14 @@ public class ControllerImpl implements ControllerIF {
 		List<ClusteringAlgorithmMultiRunningResult> results = new ArrayList<ClusteringAlgorithmMultiRunningResult>();
 		
 		for (int i = 0; i < algorithms.size(); i++) {
+			System.out.println("starting executing algorithm: " + algorithms.get(i).getName());
 			List<Run> runs = new ArrayList<Run>();
 			for (int j = 0; j < numRuns; j++) {
+				DurationUtils.storeCurrentTime();
 				AbstractPartitioningAlgorithm algorithm = AbstractClusteringAlgorithm.Factory.createHardPartitioningAlgorithm(algorithms.get(i), k, patterns);
 				algorithm.partition();
 				runs.add(new Run(j, algorithm.getObjectiveFunction(), algorithm.getClusteringResult()));
+				System.out.println("iteration " + j + " took " + DurationUtils.getDurationInSec() + " sec");
 			}
 			results.add(new ClusteringAlgorithmMultiRunningResult(algorithms.get(i), runs));
 		}
@@ -63,8 +70,10 @@ public class ControllerImpl implements ControllerIF {
 		Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(dataFilename, delimeter, lastColumnIsLable);
 		Hierarchical hierachical = AbstractClusteringAlgorithm.Factory.createHierachhicalAlgorithm(linkageCriterion, patterns);
 		hierachical.partition();
+		hierachical.adjustRange();
 		Cluster rootCluster = hierachical.getRootCluster();
 		DendroWindow dendroWindow = new DendroWindow(rootCluster);
+		openWindows.add(dendroWindow);
 		dendroWindow.run();
 		
 		return null;
@@ -96,6 +105,7 @@ public class ControllerImpl implements ControllerIF {
 	
 	private void displayKMeansBenchmarkResults(List<ClusteringAlgorithmMultiRunningResult> results, List<ClusteringAlgorithm> algorithms) {
 		ChartWindow resultWindow = new ChartWindow();
+		openWindows.add(resultWindow);
 		resultWindow.createMainWindow();
 		resultWindow.open();
 		
@@ -196,6 +206,14 @@ public class ControllerImpl implements ControllerIF {
 		} catch (StringIndexOutOfBoundsException e) {
 		}
 		return string;
+	}
+
+	@Override
+	public void closeAllOpenWindows() {
+		for (Closeable closeable : openWindows) {
+			closeable.close();
+		}
+		openWindows.clear();
 	}
  
 }

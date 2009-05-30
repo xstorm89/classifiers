@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * @author Alaa
  */
-public class ClusteringResultWindow {
+public class ClusteringResultWindow implements Closeable {
 
 	private Shell resultWindow = null;  //  @jve:decl-index=0:visual-constraint="-30,-16"
 	private String printedClusteringResult;
@@ -50,6 +50,12 @@ public class ClusteringResultWindow {
 
 	public void open() {
 		resultWindow.open();
+	}
+	
+	@Override
+	public void close() {
+		if (resultWindow != null && resultWindow.isVisible())
+			resultWindow.close();
 	}
 
 }  //  @jve:decl-index=0:visual-constraint="153,17"

@@ -34,11 +34,7 @@ import ddraw.Dendrogram;
 import ddraw.Jif;
 import ddraw.Node;
 
-/**
- * @author Alaa
- *
- */
-public class DendroWindow {
+public class DendroWindow implements Closeable {
 
 	private Shell mainWindow = null;  //  @jve:decl-index=0:visual-constraint="10,10"
 	private Composite chartComposite = null;
@@ -212,5 +208,11 @@ public class DendroWindow {
 		d.paintComponent(g);
 		return bi;
 	}
-
+	
+	@Override
+	public void close() {
+		if (mainWindow != null && mainWindow.isVisible())
+			mainWindow.close();
+	}
+	
 }
