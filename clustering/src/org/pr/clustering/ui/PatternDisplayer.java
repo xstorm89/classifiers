@@ -20,7 +20,9 @@ public class PatternDisplayer implements Closeable {
 	
 	ChartWindow resultWindow;
 	
-	public PatternDisplayer(Vector[] patterns) {
+	String datasetName;
+	
+	public PatternDisplayer(Vector[] patterns, String datasetName) {
 		if (patterns == null || patterns.length == 0)
 			throw new IllegalArgumentException("patterns should contain at least one element");
 		
@@ -31,12 +33,13 @@ public class PatternDisplayer implements Closeable {
 			System.out.println("patterns has more than 2 dimensions. only 2 dimensions will be displayed, and the others will be ignored");
 		
 		this.patterns = patterns;
+		this.datasetName = datasetName;
 	}
 	
 	public void showPatterns() {
 		resultWindow = new ChartWindow();
 		resultWindow.createMainWindow();
-		resultWindow.setChartTitle("Visualizing Patterns");
+		resultWindow.setChartTitle("Visualizing Dataset: " + datasetName);
 		resultWindow.setXAxixTitle("X");
 		resultWindow.setYAxixTitle("Y");
 		resultWindow.open();
