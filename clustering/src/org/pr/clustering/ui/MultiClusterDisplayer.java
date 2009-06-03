@@ -8,6 +8,7 @@ import java.util.Random;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.pr.clustering.ClusteringAlgorithm;
 import org.pr.clustering.Vector;
 import org.swtchart.Chart;
 import org.swtchart.IAxisSet;
@@ -25,6 +26,9 @@ public class MultiClusterDisplayer implements Closeable {
 	
 	List<List<Vector>> patternsList;
 	
+	ClusteringAlgorithm usedAlgorithm; 
+	String datasetName;
+	
 	private static List<RGB> COLORS = new ArrayList<RGB>();
 	
 	static {
@@ -38,7 +42,7 @@ public class MultiClusterDisplayer implements Closeable {
 	
 	Random rand = new Random(Calendar.getInstance().getTimeInMillis());
 	
-	public MultiClusterDisplayer(List<List<Vector>> patternsList) {
+	public MultiClusterDisplayer(List<List<Vector>> patternsList, ClusteringAlgorithm usedAlgorithm, String datasetName) {
 		if (patternsList.get(0) == null || patternsList.get(0).size() == 0)
 			throw new IllegalArgumentException("patterns should contain at least one element");
 		
@@ -49,12 +53,14 @@ public class MultiClusterDisplayer implements Closeable {
 			System.out.println("patterns has more than 2 dimensions. only 2 dimensions will be displayed, and the others will be ignored");
 		
 		this.patternsList = patternsList;
+		this.usedAlgorithm = usedAlgorithm;
+		this.datasetName = datasetName;
 	}
 	
 	public void displayClusters() {
 		resultWindow = new ChartWindow();
 		resultWindow.createMainWindow();
-		resultWindow.setChartTitle("Clustering Results");
+		resultWindow.setChartTitle("Clustering Results [algorithm: " + usedAlgorithm.getName() + " - dataset: " + datasetName + "]");
 		resultWindow.setXAxixTitle("X");
 		resultWindow.setYAxixTitle("Y");
 		resultWindow.open();

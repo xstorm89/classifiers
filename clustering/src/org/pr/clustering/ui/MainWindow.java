@@ -1,5 +1,6 @@
 package org.pr.clustering.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -280,7 +281,11 @@ public class MainWindow extends Composite {
 				patternsList.get(patternMemberships[i].cluster).add(patternMemberships[i].pattern);
 			}
 			
-			MultiClusterDisplayer multiClusterDisplayer = new MultiClusterDisplayer(patternsList);
+			
+			int indexOfLastSlash = fileName.lastIndexOf(File.separator);
+			int indexOfLastDot = fileName.lastIndexOf(".");
+			String shortFileName = fileName.substring(indexOfLastSlash + 1, indexOfLastDot);
+			MultiClusterDisplayer multiClusterDisplayer = new MultiClusterDisplayer(patternsList, algorithm.getType(), shortFileName);
 			openWindows.add(multiClusterDisplayer);
 			multiClusterDisplayer.displayClusters();
 			}
@@ -374,7 +379,7 @@ public class MainWindow extends Composite {
 				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
 				Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
 				if (patterns.length > 0 && patterns[0].getDimensionCount() == 2) {
-					PatternDisplayer patternDisplayer = new PatternDisplayer(patterns);
+					PatternDisplayer patternDisplayer = new PatternDisplayer(patterns, getFileShortName(fileName));
 					openWindows.add(patternDisplayer);
 					patternDisplayer.showPatterns();
 				}
@@ -571,6 +576,15 @@ public class MainWindow extends Composite {
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 				widgetSelected(arg0);
 			}});
+	}
+	
+	private String getFileShortName(String filename) {
+		int indexOfLastSlash = filename.lastIndexOf(File.separator);
+		int indexOfLastDot = filename.lastIndexOf(".");
+		if (indexOfLastDot >= 0)
+			return filename.substring(indexOfLastSlash + 1, indexOfLastDot);
+		else 
+			return filename.substring(indexOfLastSlash + 1);
 	}
 
 }  //  @jve:decl-index=0:visual-constraint="-5,-1"
