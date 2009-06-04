@@ -42,7 +42,7 @@ public enum ClusteringAlgorithm {
 		return algorithms.toArray(new String[algorithms.size()]);
 	}
 	
-	public static ClusteringAlgorithm createAlgorithmByName(String name) {
+	public static ClusteringAlgorithm create(String name) {
 		for (int i = 0; i < ClusteringAlgorithm.values().length; i++) {
 			if (ClusteringAlgorithm.values()[i].name.equals(name))
 				return ClusteringAlgorithm.values()[i];

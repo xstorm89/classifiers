@@ -112,30 +112,25 @@ public class ControllerImpl implements ControllerIF {
 		this.numberOfRuns = results.get(0).getRuns().size();
 		
 		double[] means = new double[algorithms.size()];
-		for (int i = 0; i < numberOfRuns; i++) {
-			for (int j = 0; j < means.length; j++) {
-				means[j] += results.get(j).getRuns().get(i).getY();
+		for (int i = 0; i < means.length; i++) {
+			for (int j = 0; j < numberOfRuns; j++) {
+				means[i] += results.get(i).getRuns().get(j).getY();
 			}
 		}
 		
 		for (int j = 0; j < means.length; j++) {
-			means[j] /= numberOfRuns;
+			means[j] /= (double) numberOfRuns;
 		}
 		
 		double[] vars = new double[algorithms.size()];
 		
-		double kmeansVar=0,DHFVar=0,DHBVar=0,ABFVar=0,AFBVar=0;
-		for (int i = 0; i < numberOfRuns; i++) {
-			for (int j = 0; j < means.length; j++) {
-				vars[j] += Math.abs(results.get(j).getRuns().get(i).getY() - means[j]);
+		
+		for (int i = 0; i < means.length; i++) {
+			for (int j = 0; j < numberOfRuns; j++) {
+				double difference = Math.abs(results.get(i).getRuns().get(j).getY() - means[i]);
+				vars[i] += (difference * difference);
 			}
 		}
-		
-		kmeansVar /= (numberOfRuns-1);
-		DHFVar /= (numberOfRuns-1);
-		DHBVar /= (numberOfRuns-1);
-		ABFVar /= (numberOfRuns-1);
-		AFBVar /= (numberOfRuns-1);
 		
 		Chart chart = resultWindow.getChart();
 		ISeriesSet seriesSet = chart.getSeriesSet();
@@ -144,10 +139,17 @@ public class ControllerImpl implements ControllerIF {
 			seriesSet.deleteSeries(ser[i].getId());
 		}
 		
+		// calculating standard deviation
+		double[] sd = new double[vars.length];
+		
+		for (int j = 0; j < vars.length; j++) {
+			sd[j] = Math.sqrt(vars[j] / (double) numberOfRuns);
+		}
+		
 		int algorithmIndex = algorithms.indexOf(ClusteringAlgorithm.KMeans);
 		if (algorithmIndex > -1) {
 			ILineSeries kMeansSeries= (ILineSeries) seriesSet.createSeries
-				(SeriesType.LINE, "KMeans (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
+				(SeriesType.LINE, "KMeans (μ=" + format(means[algorithmIndex]) + ", σ=" + format(sd[algorithmIndex]) + ")");
 			kMeansSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			kMeansSeries.setLineColor(new Color(Display.getDefault(), new RGB(255, 0, 0)));
 			kMeansSeries.setLineWidth(2);
@@ -157,7 +159,7 @@ public class ControllerImpl implements ControllerIF {
 		algorithmIndex = algorithms.indexOf(ClusteringAlgorithm.DHF);
 		if (algorithmIndex > -1) {
 			ILineSeries DHFSeries= (ILineSeries) seriesSet.createSeries
-				(SeriesType.LINE, "DHF (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
+				(SeriesType.LINE, "DHF (μ=" + format(means[algorithmIndex]) + ", σ=" + format(sd[algorithmIndex]) + ")");
 			DHFSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			DHFSeries.setLineColor(new Color(Display.getDefault(), new RGB(0, 0, 255)));
 			DHFSeries.setLineWidth(2);
@@ -167,7 +169,7 @@ public class ControllerImpl implements ControllerIF {
 		algorithmIndex = algorithms.indexOf(ClusteringAlgorithm.DHB);
 		if (algorithmIndex > -1) {
 			ILineSeries DHBSeries= (ILineSeries) seriesSet.createSeries
-				(SeriesType.LINE, "DHB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
+				(SeriesType.LINE, "DHB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(sd[algorithmIndex]) + ")");
 			DHBSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			DHBSeries.setLineColor(new Color(Display.getDefault(), new RGB(0, 128, 0)));
 			DHBSeries.setLineWidth(2);
@@ -177,7 +179,7 @@ public class ControllerImpl implements ControllerIF {
 		algorithmIndex = algorithms.indexOf(ClusteringAlgorithm.AFB);
 		if (algorithmIndex > -1) {
 			ILineSeries AFBSeries= (ILineSeries) seriesSet.createSeries
-				(SeriesType.LINE, "AFB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
+				(SeriesType.LINE, "AFB (μ=" + format(means[algorithmIndex]) + ", σ=" + format(sd[algorithmIndex]) + ")");
 			AFBSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			AFBSeries.setLineColor(new Color(Display.getDefault(), new RGB(255, 128, 0)));
 			AFBSeries.setLineWidth(2);
@@ -187,7 +189,7 @@ public class ControllerImpl implements ControllerIF {
 		algorithmIndex = algorithms.indexOf(ClusteringAlgorithm.ABF);
 		if (algorithmIndex > -1) {
 			ILineSeries ABFSeries= (ILineSeries) seriesSet.createSeries
-				(SeriesType.LINE, "ABF (μ=" + format(means[algorithmIndex]) + ", σ=" + format(vars[algorithmIndex]) + ")");
+				(SeriesType.LINE, "ABF (μ=" + format(means[algorithmIndex]) + ", σ=" + format(sd[algorithmIndex]) + ")");
 			ABFSeries.setYSeries(results.get(algorithmIndex).getObjectiveFunctionSeries());
 			ABFSeries.setLineColor(new Color(Display.getDefault(), new RGB(0, 0, 0)));
 			ABFSeries.setLineWidth(2);

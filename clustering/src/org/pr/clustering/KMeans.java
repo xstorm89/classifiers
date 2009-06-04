@@ -27,7 +27,8 @@ public class KMeans extends AbstractPartitioningAlgorithm {
 		for (int i = 0; i < k; i++) {
 			Integer pattern;
 			do {
-				pattern = rand.nextInt(patterns.length); 
+				// pattern = rand.nextInt(patterns.length); 
+				pattern = (int) (Math.random() * patterns.length);
 			} while (usedPatterns.contains(pattern));
 			
 			usedPatterns.add(pattern);

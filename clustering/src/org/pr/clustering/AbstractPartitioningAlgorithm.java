@@ -19,6 +19,8 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 	
 	protected int[] clusterSizes;
 	
+	protected StoppingCondition stoppingCondition = StoppingCondition.REACHED_STOPPING_CRITRIA;
+	
 	public AbstractPartitioningAlgorithm(int k, Vector[] patterns, ClusteringAlgorithm type) {
 		this.k = k;
 		this.patterns = patterns;
@@ -46,9 +48,8 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 	
 	public double getObjectiveFunction() {
 		double globalError = 0;
-		List<Integer> clusters = mm.getClusters();
 		for (int i = 0; i < k; i++) {
-			double clusterError = getClusterMeanSquareError(clusters.get(i), cluserCenters);
+			double clusterError = getClusterMeanSquareError(i, cluserCenters);
 			globalError += clusterError;
 		}
 		
@@ -100,9 +101,8 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 	
 	protected double getObjectiveFunction(List<Vector> Z) {
 		double globalError = 0;
-		List<Integer> clusters = mm.getClusters();
 		for (int i = 0; i < k; i++) {
-			double clusterError = getClusterMeanSquareError(clusters.get(i), Z);
+			double clusterError = getClusterMeanSquareError(i, Z);
 			globalError += clusterError;
 		}
 		
@@ -117,7 +117,8 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 		double clusterError = 0;
 		Vector clusterCenter = Z.get(clusterIndex);
 		for (int j = 0; j < clusterPatterns.length; j++) {
-			clusterError += Vector.euclideanDistance(patterns[clusterPatterns[j]], clusterCenter);
+			double distance = Vector.euclideanDistance(patterns[clusterPatterns[j]], clusterCenter);
+			clusterError += (distance * distance);
 		}
 		
 		return clusterError;
@@ -133,6 +134,15 @@ public abstract class AbstractPartitioningAlgorithm extends AbstractClusteringAl
 		}
 		
 		return sb.toString();
+	}
+	
+	public StoppingCondition getStoppingCondition() {
+		return stoppingCondition;
+	}
+	
+	public enum StoppingCondition {
+		REACHED_STOPPING_CRITRIA,
+		ABOVE_MAX_ITERATIONS
 	}
 	
 }

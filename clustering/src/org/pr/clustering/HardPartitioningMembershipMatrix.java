@@ -31,14 +31,25 @@ public class HardPartitioningMembershipMatrix {
 		// for the first k patterns, assign them to k cluster
 		// this way, we guarantee that every cluster has at least one pattern
 		
-		for (int i = 0; i < k; i++) {
-			memerships[i] = i;
+		// for each pattern, randomly choose a cluster for it
+		int[] clusterSizes = new int[k];
+		for (int i = 0; i < n; i++) {
+			int clusterIndex = random.nextInt(k);
+			clusterSizes[clusterIndex]++;
+			memerships[i] = clusterIndex;
 		}
 		
-		// for each pattern, randomly choose a cluster for it
-		for (int i = k; i < n; i++) {
-			int clusterIndex = random.nextInt(k);
-			memerships[i] = clusterIndex;
+		for (int i = 0; i < clusterSizes.length; i++) {
+			if (clusterSizes[i] == 0) {
+				for (int j = 0; j < clusterSizes.length; j++) {
+					if (clusterSizes[j] > 1) { // we can take one from this cluster
+						int patternToGiveup = getPatternsForCluster(j)[0];
+						memerships[patternToGiveup] = i;
+						clusterSizes[i]++;
+						clusterSizes[j]--;
+					}
+				}
+			}
 		}
 	}
 	

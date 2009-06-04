@@ -124,16 +124,5 @@ public class MembershipMatrix {
 		
 		return _patterns;
 	}
-	
-	public static void main(String[] args) { 
-		MembershipMatrix mm = new MembershipMatrix(5, 3);
-		List<Integer> clusters = mm.getClusters();
-		System.out.println("");
-		
-		int[] patterns0 = mm.getPatternsForCluster(0);
-		int[] patterns1 = mm.getPatternsForCluster(1);
-		int[] patterns2 = mm.getPatternsForCluster(2);
-		
-		System.out.println();
-	}
+
 }
