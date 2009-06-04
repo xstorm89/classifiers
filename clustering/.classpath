@@ -9,6 +9,5 @@
 	<classpathentry kind="lib" path="lib/org.swtchart_0.5.0.v20090512.jar"/>
 	<classpathentry kind="lib" path="lib/org.swtchart.ext_0.5.0.v20090512.jar"/>
 	<classpathentry kind="lib" path="lib/DDraw.jar"/>
-	<classpathentry kind="lib" path="lib/swsms-2.9.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
