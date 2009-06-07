@@ -101,18 +101,18 @@ public class FuzzyCMeans extends AbstractClusteringAlgorithm {
 	
 	public String printResults() {
 		StringBuilder sb = new StringBuilder("");
-		sb.append("\t\t\t\tpattern \t\t cluster memberships" + "\n");
+		sb.append("\tcluster memberships" + "\n");
 		sb.append("-------------------------------------------------------------");
 		DecimalFormat membershipFormat = new DecimalFormat("0.000");
 		DecimalFormat lineNumberFormat = new DecimalFormat("000");
 		
 		for (int i = 0; i < patterns.length; i++) { // loop over patterns
 			// sb.append("\n" + lineNumberFormat.format(i) + ")\t\t" + patterns[i] + " >> ");
-			sb.append("\n" + lineNumberFormat.format(i) + ") " + patterns[i] + " >> ");
+			sb.append("\n" + lineNumberFormat.format(i) + ")   ");
 			for (int j = 0; j < k; j++) { // loop over clusters
 				sb.append(membershipFormat.format(mm.matrix[i][j]));
 				if (j < k - 1)
-					sb.append("\t");
+					sb.append("    ");
 			}
 		}
 		
