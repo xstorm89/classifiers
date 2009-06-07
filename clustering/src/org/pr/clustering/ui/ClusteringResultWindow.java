@@ -44,7 +44,7 @@ public class ClusteringResultWindow implements Closeable {
 		formData1.bottom = new FormAttachment(100,-5);
 		formData1.right = new FormAttachment(30,-50);
 		formData1.left = new FormAttachment(0,50);
-		Text clusteringResultTextArea = new Text(resultWindow, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY);
+		Text clusteringResultTextArea = new Text(resultWindow, SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		clusteringResultTextArea.setText(printedClusteringResult);
 	}
 

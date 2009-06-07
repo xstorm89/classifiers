@@ -146,11 +146,11 @@ public class SoftKMeans extends AbstractClusteringAlgorithm {
 		
 		for (int i = 0; i < patterns.length; i++) { // loop over patterns
 			// sb.append("\n" + lineNumberFormat.format(i) + ")\t\t" + patterns[i] + " >> ");
-			sb.append("\n" + lineNumberFormat.format(i) + ") " + patterns[i] + " >> ");
+			sb.append("\n" + lineNumberFormat.format(i) + ") ");
 			for (int j = 0; j < k; j++) { // loop over clusters
 				sb.append(membershipFormat.format(mm.matrix[i][j]));
 				if (j < k - 1)
-					sb.append("\t");
+					sb.append("    ");
 			}
 		}
 		
