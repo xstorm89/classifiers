@@ -56,7 +56,7 @@ public class FuzzyCMeans extends AbstractClusteringAlgorithm {
 						denominator += ratio;
 					}
 					
-					mm.matrix[i][j] = 1.0 / denominator; 
+					mm.matrix[i][j] = 1.0 / denominator;
 				}
 			}
 			
@@ -66,7 +66,9 @@ public class FuzzyCMeans extends AbstractClusteringAlgorithm {
 				break;
 		}
 		
-		System.out.println(newZ);
+		for (Vector vector : newZ) {
+			System.out.println(vector);	
+		}
 		
 		// TODO not implmented
 		return null;
@@ -103,7 +105,7 @@ public class FuzzyCMeans extends AbstractClusteringAlgorithm {
 		StringBuilder sb = new StringBuilder("");
 		sb.append("\tcluster memberships" + "\n");
 		sb.append("-------------------------------------------------------------");
-		DecimalFormat membershipFormat = new DecimalFormat("0.000");
+		DecimalFormat membershipFormat = new DecimalFormat("0.0000000000");
 		DecimalFormat lineNumberFormat = new DecimalFormat("000");
 		
 		for (int i = 0; i < patterns.length; i++) { // loop over patterns

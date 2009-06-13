@@ -226,7 +226,9 @@ public class MainWindow extends Composite {
 				String fileName = inputFileText.getText();
 				String delimeter = tabRadioButton.getSelection()
 					? "\t"
-					: " ";
+					: spaceRadioButton.getSelection()
+						? " "
+						: ",";
 				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
 				int numberOfRuns = numOfRunsText.getText() != null && ! numOfRunsText.getText().equals("")
 					? Integer.valueOf(numOfRunsText.getText())
@@ -265,7 +267,9 @@ public class MainWindow extends Composite {
 				String fileName = inputFileText.getText();
 				String delimeter = tabRadioButton.getSelection()
 					? "\t"
-					: " ";
+					: spaceRadioButton.getSelection()
+						? " "
+						: ",";
 				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
 					
 				Vector[] patterns = AbstractClusteringAlgorithm.loadPatterns(fileName, delimeter, lastColumnIsLable);
@@ -579,7 +583,9 @@ public class MainWindow extends Composite {
 				String fileName = inputFileText.getText();
 				String delimeter = tabRadioButton.getSelection()
 					? "\t"
-					: " ";
+					: spaceRadioButton.getSelection()
+						? " "
+						: ",";
 				boolean lastColumnIsLable = lastColumnIsLabelCheckBox.getSelection();
 				
 				if (fuzzyRadioButton.getSelection()) {
