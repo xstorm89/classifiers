@@ -1,5 +1,6 @@
 package org.pr.clustering.soft;
 
+import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -30,18 +31,18 @@ public class MembershipMatrix {
 		// THIS WAY WE WILL GET OVERLAPPING CLUSTER CENTERS AT THE FIRST STEP
 		
 		// we need to really randomize this
-		Random rand = new Random(Calendar.getInstance().getTimeInMillis());
-		for (int i = 0; i < n; i++) {
+		SecureRandom rand = new SecureRandom();
+		for (int i = 0; i < n; i++) {			
 			double rowSum = 0;
 			for (int j = 0; j < c; j++) {
 				double randomMembership = rand.nextDouble();
-				if (randomMembership + rowSum >= 1) {
-					matrix[i][j] = 1- rowSum;
-					break;
-				} else {
-					matrix[i][j] = randomMembership;
-					rowSum += randomMembership;
-				}
+				matrix[i][j] = randomMembership;
+				rowSum += randomMembership;
+			}
+			
+			// normalize
+			for (int j = 0; j < c; j++) {
+				matrix[i][j] /= rowSum;
 			}
 		}
 	}

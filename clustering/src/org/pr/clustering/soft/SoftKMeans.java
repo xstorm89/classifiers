@@ -141,7 +141,7 @@ public class SoftKMeans extends AbstractClusteringAlgorithm {
 		StringBuilder sb = new StringBuilder("");
 		sb.append("\t\t\t\tpattern \t\t cluster memberships" + "\n");
 		sb.append("-------------------------------------------------------------");
-		DecimalFormat membershipFormat = new DecimalFormat("0.000");
+		DecimalFormat membershipFormat = new DecimalFormat("0.0000000000");
 		DecimalFormat lineNumberFormat = new DecimalFormat("000");
 		
 		for (int i = 0; i < patterns.length; i++) { // loop over patterns
