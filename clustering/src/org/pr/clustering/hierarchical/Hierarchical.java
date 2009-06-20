@@ -67,11 +67,19 @@ public class Hierarchical extends AbstractClusteringAlgorithm {
 	
 	public void adjustRange() {
 		double factor;
+		if(this.sm.average < 10)
+			factor = .001;
+		else if(this.sm.average < 1000)
+			factor = .01;
+		else
+			factor = .08;
+/*		else
+			factor = .01;
 		if(this.sm.average < 100000)
 			factor = .08;
 		else
 			factor = .01;
-		getRootCluster().scale(factor);
+*/		getRootCluster().scale(factor);
 	}
 	
 	public static void main(String[] args) {
