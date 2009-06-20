@@ -1,9 +1,6 @@
 package org.pr.clustering.soft;
 
 import java.security.SecureRandom;
-import java.util.Calendar;
-import java.util.Random;
-
 
 /**
  * @author Ahmad

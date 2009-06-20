@@ -1,9 +1,8 @@
 package org.pr.clustering;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Ahmad
@@ -22,13 +21,13 @@ public class KMeans extends AbstractPartitioningAlgorithm {
 	public List<Integer> partition() {
 		// we need to randomize this step
 		List<Vector> newZ = new ArrayList<Vector>();
-		Random rand = new Random(Calendar.getInstance().getTimeInMillis());
+		SecureRandom rand = new SecureRandom();
 		List<Integer> usedPatterns = new ArrayList<Integer>();
 		for (int i = 0; i < k; i++) {
 			Integer pattern;
 			do {
 				// pattern = rand.nextInt(patterns.length); 
-				pattern = (int) (Math.random() * patterns.length);
+				pattern = (int) (rand.nextDouble() * patterns.length);
 			} while (usedPatterns.contains(pattern));
 			
 			usedPatterns.add(pattern);
