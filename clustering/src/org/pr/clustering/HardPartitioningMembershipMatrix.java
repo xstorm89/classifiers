@@ -1,9 +1,8 @@
 package org.pr.clustering;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Ahmad
@@ -26,7 +25,7 @@ public class HardPartitioningMembershipMatrix {
 		
 		memerships = new int[n];
 		
-		Random random = new Random(Calendar.getInstance().getTimeInMillis());
+		SecureRandom random = new SecureRandom();
 		
 		// for the first k patterns, assign them to k cluster
 		// this way, we guarantee that every cluster has at least one pattern
